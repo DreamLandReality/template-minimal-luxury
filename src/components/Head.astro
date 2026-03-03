@@ -1,0 +1,112 @@
+---
+import { getSectionData } from '../lib/manifest-loader';
+
+const heroData = getSectionData('hero');
+const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
+
+export interface Props {
+  title: string;
+  seo: {
+    description?: string;
+    keywords?: string[];
+    image?: string;
+    imageAlt?: string;
+    locale?: string;
+    canonicalUrl?: string;
+    structuredData?: Record<string, any>;
+  };
+}
+
+const { title, seo } = Astro.props;
+---
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>{title}</title>
+  <meta name="description" content={seo.description} />
+  {seo.keywords && seo.keywords.length > 0 && (
+    <meta name="keywords" content={seo.keywords.join(', ')} />
+  )}
+
+  <!-- Canonical URL -->
+  {seo.canonicalUrl && (
+    <link rel="canonical" href={seo.canonicalUrl} />
+  )}
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={seo.description} />
+  {seo.image && <meta property="og:image" content={seo.image} />}
+  {seo.imageAlt && <meta property="og:image:alt" content={seo.imageAlt} />}
+  {seo.locale && <meta property="og:locale" content={seo.locale} />}
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={seo.description} />
+  {seo.image && <meta name="twitter:image" content={seo.image} />}
+  {seo.imageAlt && <meta name="twitter:image:alt" content={seo.imageAlt} />}
+
+  <!-- Hero Image Preload -->
+  {heroData.backgroundImage && (
+    <link rel="preload" as="image" href={imgSrc(heroData.backgroundImage)} fetchpriority="high" />
+  )}
+
+  <!-- JSON-LD: RealEstateListing -->
+  {seo.structuredData && (
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "RealEstateListing",
+      "name": seo.structuredData.propertyName,
+      "description": seo.structuredData.description,
+      ...(seo.structuredData.url && { "url": seo.structuredData.url }),
+      ...(seo.image && { "image": seo.image }),
+      ...(seo.structuredData.datePosted && { "datePosted": seo.structuredData.datePosted }),
+      ...(seo.structuredData.priceRange && {
+        "offers": {
+          "@type": "AggregateOffer",
+          "lowPrice": String(seo.structuredData.priceRange.low),
+          "highPrice": String(seo.structuredData.priceRange.high),
+          "priceCurrency": seo.structuredData.priceRange.currency,
+          "offerCount": "1"
+        }
+      }),
+      ...(seo.structuredData.address && {
+        "address": {
+          "@type": "PostalAddress",
+          ...(seo.structuredData.address.street && { "streetAddress": seo.structuredData.address.street }),
+          "addressLocality": seo.structuredData.address.locality,
+          "addressRegion": seo.structuredData.address.region,
+          ...(seo.structuredData.address.postalCode && { "postalCode": seo.structuredData.address.postalCode }),
+          "addressCountry": seo.structuredData.address.country
+        }
+      }),
+      ...(seo.structuredData.geo?.latitude && seo.structuredData.geo?.longitude && {
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": String(seo.structuredData.geo.latitude),
+          "longitude": String(seo.structuredData.geo.longitude)
+        }
+      })
+    })} />
+  )}
+
+  <!-- JSON-LD: RealEstateAgent (Developer) -->
+  {seo.structuredData?.developer && (
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "RealEstateAgent",
+      "name": seo.structuredData.developer.name,
+      ...(seo.structuredData.developer.url && { "url": seo.structuredData.developer.url }),
+      ...(seo.structuredData.developer.logo && { "logo": seo.structuredData.developer.logo })
+    })} />
+  )}
+
+  <!-- Font Preload -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>

@@ -1,0 +1,278 @@
+---
+export interface Props {
+  data: {
+    logo: { text: string; imageUrl?: string };
+    links: { label: string; href: string }[];
+  };
+  transparentNav?: boolean;
+}
+
+const { data, transparentNav = false } = Astro.props;
+const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`
+---
+
+<nav
+  class={`nav-bar fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-out ${transparentNav ? 'nav-transparent' : 'scrolled'}`}
+  data-dr-section="navigation"
+  id="main-nav"
+  data-is-transparent={String(transparentNav)}
+>
+  <div class="max-w-7xl mx-auto flex justify-between items-center px-8 md:px-12 py-5">
+    <!-- Logo -->
+    {data.logo.imageUrl ? (
+      <a href="/" class="nav-logo flex items-center">
+        <img src={imgSrc(data.logo.imageUrl!)} alt={data.logo.text} class="h-8 w-auto" data-dr-field="logo.imageUrl" />
+      </a>
+    ) : (
+      <a
+        href="/"
+        class="nav-logo text-xl md:text-2xl font-serif tracking-[0.25em] uppercase transition-colors duration-300"
+        data-dr-field="logo.text"
+      >
+        {data.logo.text}
+      </a>
+    )}
+
+    <!-- Desktop Links -->
+    <ul class="hidden md:flex items-center space-x-10" data-dr-list="links">
+      {data.links.map((link) => (
+        <li data-dr-list-item>
+          <a
+            href={link.href}
+            class="nav-link relative text-[11px] uppercase tracking-[0.3em] font-light transition-all duration-300"
+            data-dr-field="label"
+          >
+            {link.label}
+            <span class="nav-link-underline"></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Mobile Menu Button -->
+    <button
+      class="md:hidden flex flex-col justify-center items-center w-8 h-8 space-y-[5px] group"
+      id="mobile-menu-btn"
+      aria-label="Toggle navigation menu"
+    >
+      <span class="hamburger-line w-6 h-[1.5px] transition-all duration-300 origin-center"></span>
+      <span class="hamburger-line w-4 h-[1.5px] transition-all duration-300 group-hover:w-6"></span>
+      <span class="hamburger-line w-6 h-[1.5px] transition-all duration-300 origin-center"></span>
+    </button>
+  </div>
+
+  <!-- Mobile Menu Overlay -->
+  <div
+    class="mobile-menu fixed inset-0 z-40 flex flex-col items-center justify-center bg-surface opacity-0 pointer-events-none transition-opacity duration-500"
+    id="mobile-menu"
+  >
+    <ul class="flex flex-col items-center space-y-8" data-dr-list="links">
+      {data.links.map((link, i) => (
+        <li data-dr-list-item class="overflow-hidden">
+          <a
+            href={link.href}
+            class="mobile-link block text-2xl font-serif tracking-[0.2em] uppercase text-border hover:text-primary transition-all duration-300"
+            style={`transition-delay: ${i * 80}ms`}
+            data-dr-field="label"
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<style>
+  /* ── Initial state: transparent over hero ── */
+  .nav-bar.nav-transparent {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .nav-bar.nav-transparent .nav-logo {
+    color: var(--primary-foreground);
+  }
+
+  .nav-bar.nav-transparent .nav-link {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .nav-bar.nav-transparent .nav-link:hover {
+    color: var(--primary-foreground);
+  }
+
+  .nav-bar.nav-transparent .hamburger-line {
+    background: var(--primary-foreground);
+  }
+
+  /* ── Scrolled state: solid surface ── */
+  .nav-bar.scrolled {
+    background: var(--surface) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 1px 30px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .nav-bar.scrolled .nav-logo {
+    color: var(--primary) !important;
+  }
+
+  .nav-bar.scrolled .nav-link {
+    color: var(--muted) !important;
+  }
+
+  .nav-bar.scrolled .nav-link:hover {
+    color: var(--primary) !important;
+  }
+
+  .nav-bar.scrolled .hamburger-line {
+    background: var(--primary) !important;
+  }
+
+  /* ── Link underline animation ── */
+  .nav-link-underline {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center;
+  }
+
+  .nav-link:hover .nav-link-underline {
+    transform: translateX(-50%) scaleX(1);
+  }
+
+  /* ── Mobile menu ── */
+  .mobile-menu.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-link {
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.3s ease;
+  }
+
+  .mobile-menu.open .mobile-link {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* ── Hamburger → X animation ── */
+  .nav-bar.menu-open .hamburger-line {
+    background: var(--primary);
+  }
+
+  .nav-bar.menu-open .hamburger-line:nth-child(1) {
+    transform: translateY(3.25px) rotate(45deg);
+  }
+
+  .nav-bar.menu-open .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .nav-bar.menu-open .hamburger-line:nth-child(3) {
+    transform: translateY(-3.25px) rotate(-45deg);
+  }
+</style>
+
+<script is:inline>
+  // Scroll-based navbar appearance
+  (function() {
+    function initNavScroll() {
+      const nav = document.getElementById('main-nav');
+      if (!nav) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initNavScroll);
+        }
+        return;
+      }
+
+      const isTransparent = nav.getAttribute('data-is-transparent') === 'true';
+      if (!isTransparent) return;
+
+      // Use Intersection Observer - works universally in all contexts
+      const sentinel = document.createElement('div');
+      sentinel.style.position = 'absolute';
+      sentinel.style.top = '60px';
+      sentinel.style.height = '1px';
+      sentinel.style.width = '100%';
+      sentinel.style.pointerEvents = 'none';
+      sentinel.style.visibility = 'hidden';
+      document.body.appendChild(sentinel);
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          // If sentinel is not visible, we've scrolled past 60px
+          const scrolledPast = !entries[0].isIntersecting;
+
+          if (scrolledPast) {
+            nav.classList.add('scrolled');
+            nav.classList.remove('nav-transparent');
+          } else {
+            nav.classList.remove('scrolled');
+            nav.classList.add('nav-transparent');
+          }
+        },
+        { threshold: [0, 1] }
+      );
+
+      observer.observe(sentinel);
+    }
+
+    // Run immediately or wait for DOM
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initNavScroll);
+    } else {
+      initNavScroll();
+    }
+  })();
+
+  // Mobile menu toggle
+  (function() {
+    function initMobileMenu() {
+      const nav = document.getElementById('main-nav');
+      const menuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+
+      if (!nav || !menuBtn || !mobileMenu) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initMobileMenu);
+        }
+        return;
+      }
+
+      menuBtn.addEventListener('click', () => {
+        const isOpen = mobileMenu.classList.contains('open');
+        mobileMenu.classList.toggle('open');
+        nav.classList.toggle('menu-open');
+        document.body.style.overflow = isOpen ? '' : 'hidden';
+      });
+
+      // Close mobile menu on link click
+      mobileMenu.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.remove('open');
+          nav.classList.remove('menu-open');
+          document.body.style.overflow = '';
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMobileMenu);
+    } else {
+      initMobileMenu();
+    }
+  })();
+</script>

@@ -1,0 +1,49 @@
+---
+export interface Props {
+  data: {
+    headline: string;
+    subtext: string;
+    backgroundImage: string;
+    backgroundImageAlt: string;
+    cta?: { text: string; href: string };
+  };
+}
+
+const { data } = Astro.props;
+const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`
+---
+
+<section class="relative h-screen flex items-center justify-center overflow-hidden" data-dr-section="hero">
+  <!-- Background Image -->
+  <div class="absolute inset-0 z-0">
+    <img
+      src={imgSrc(data.backgroundImage)}
+      alt={data.backgroundImageAlt}
+      width="1920"
+      height="1080"
+      class="w-full h-full object-cover grayscale opacity-90"
+      loading="eager"
+      fetchpriority="high"
+      data-dr-field="backgroundImage"
+    />
+    <div class="absolute inset-0 bg-black/40 pointer-events-none"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10 text-center px-6 max-w-4xl mx-auto text-primary-foreground">
+    <h1 class="text-5xl md:text-7xl font-serif mb-6 tracking-wide leading-tight" data-dr-field="headline" data-dr-style="headline">
+      {data.headline}
+    </h1>
+    <p class="text-lg md:text-xl font-light tracking-widest uppercase opacity-90 mb-8" data-dr-field="subtext" data-dr-style="subtext">
+      {data.subtext}
+    </p>
+    <!-- CTA — always rendered so data-dr-field target always exists in DOM -->
+    <a
+      href={data.cta?.href || '#contact'}
+      class={`inline-block px-8 py-3 bg-surface/10 backdrop-blur-sm border border-white/20 text-primary-foreground text-sm uppercase tracking-widest hover:bg-surface/20 transition-colors duration-300 ${!data.cta ? 'hidden' : ''}`}
+      data-dr-field="cta.text"
+    >
+      {data.cta?.text || 'View Properties'}
+    </a>
+  </div>
+</section>

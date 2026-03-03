@@ -1,0 +1,21 @@
+---
+export interface Props {
+  data: {
+    copyright: string;
+    branding?: string;
+  };
+}
+
+const { data } = Astro.props;
+---
+
+<footer class="bg-primary text-muted py-12 px-6 border-t border-border" data-dr-section="footer">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs uppercase tracking-widest">
+     <div data-dr-field="copyright" data-dr-style="copyright">
+        {data.copyright}
+     </div>
+     <div class="mt-4 md:mt-0" data-dr-field="branding" data-dr-style="branding">
+        {data.branding || 'Design by Dream Reality'}
+     </div>
+  </div>
+</footer>

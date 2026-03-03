@@ -1,0 +1,61 @@
+---
+import Head from '../components/Head.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { getSectionData, isSectionEnabled, getTheme } from '../lib/manifest-loader';
+
+const theme = getTheme();
+const navData = getSectionData('navigation');
+const footerData = getSectionData('footer');
+
+export interface Props {
+  title: string;
+  seo: any;
+  transparentNav?: boolean;
+}
+
+const { title, seo, transparentNav = false } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang={seo.language || 'en'}>
+  <Head title={title} seo={seo} />
+  <body class="font-sans antialiased bg-background text-primary selection:bg-primary selection:text-primary-foreground">
+    <style define:vars={{
+      primary: theme.colors.primary,
+      "primary-foreground": theme.colors.primaryForeground,
+      background: theme.colors.background,
+      surface: theme.colors.surface,
+      muted: theme.colors.muted,
+      border: theme.colors.border,
+      "font-sans": theme.typography.fontSans,
+      "font-serif": theme.typography.fontSerif,
+      radius: theme.radius.base
+    }}>
+      :root {
+        --primary: var(--primary);
+        --primary-foreground: var(--primary-foreground);
+        --background: var(--background);
+        --surface: var(--surface);
+        --muted: var(--muted);
+        --border: var(--border);
+        --font-sans: var(--font-sans);
+        --font-serif: var(--font-serif);
+        --radius: var(--radius);
+      }
+    </style>
+
+    {isSectionEnabled('navigation') && <Nav data={navData} transparentNav={transparentNav} />}
+
+    <main>
+      <slot />
+    </main>
+
+    {isSectionEnabled('footer') && <Footer data={footerData} />}
+
+    <script>
+      import '../lib/preview-runtime';
+      import '../lib/manifest-injector';
+    </script>
+  </body>
+</html>

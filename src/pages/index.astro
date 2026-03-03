@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import PropertyListing from '../components/PropertyListing.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { getSectionData, isSectionEnabled } from '../lib/manifest-loader';
+
+const seoData = getSectionData('seo');
+const heroData = getSectionData('hero');
+const propertiesData = getSectionData('properties');
+const contactFormData = getSectionData('contact-form');
+---
+
+<BaseLayout title={seoData.title} seo={seoData} transparentNav={true}>
+  {isSectionEnabled('hero') && <Hero data={heroData} />}
+  {isSectionEnabled('properties') && <PropertyListing data={propertiesData} />}
+  {isSectionEnabled('contact-form') && <ContactForm data={contactFormData} />}
+</BaseLayout>

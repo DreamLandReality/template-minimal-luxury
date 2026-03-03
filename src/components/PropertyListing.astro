@@ -1,0 +1,363 @@
+---
+
+export interface Props {
+  data: {
+    sectionEyebrow?: string;
+    sectionTitle?: string;
+    items: {
+      slug: string;
+      title: string;
+      subtitle: string;
+      type: string;
+      price: string;
+      thumbnail: string;
+      specs: {
+        bedrooms: number;
+        bathrooms: number;
+        area: string;
+        parking: number;
+      };
+    }[];
+  };
+}
+
+const { data } = Astro.props;
+const { sectionEyebrow = 'The Residences', sectionTitle = 'Three Distinct Worlds', items = [] } = data;
+const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`
+---
+
+<section id="properties" class="properties-section" data-dr-section="properties">
+
+  <!-- The Three Residences -->
+  <div class="residences-section">
+    <div class="residences-container">
+
+      <!-- Section intro -->
+      <div class="residences-header">
+        <p class="residences-eyebrow" data-dr-field="sectionEyebrow">{sectionEyebrow}</p>
+        <h3 class="residences-title" data-dr-field="sectionTitle">{sectionTitle}</h3>
+      </div>
+
+      <!-- Residence List — alternating layout -->
+      <div class="residences-list" data-dr-list="properties">
+        {items.map((property, index) => (
+          <a
+            href={`/properties/${property.slug}`}
+            class={`residence ${index % 2 !== 0 ? 'residence--reverse' : ''}`}
+            data-dr-list-item
+          >
+            <!-- Image Side -->
+            <div class="residence-image-wrap">
+              <div class="residence-image-inner">
+                <img
+                  src={imgSrc(property.thumbnail)}
+                  alt={property.title}
+                  width="800"
+                  height="600"
+                  class="residence-img"
+                  loading="lazy"
+                  data-dr-field="thumbnail"
+                />
+                <!-- Floor Label -->
+                <div class="residence-floor">
+                  <span class="residence-floor-num">{String(index + 1).padStart(2, '0')}</span>
+                  <span class="residence-floor-label">Residence</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info Side -->
+            <div class="residence-info">
+              <span class="residence-type" data-dr-field="type" data-dr-style="type">{property.type}</span>
+              <h4 class="residence-name" data-dr-field="title" data-dr-style="title">{property.title}</h4>
+              <p class="residence-subtitle" data-dr-field="subtitle" data-dr-style="subtitle">{property.subtitle}</p>
+
+              <!-- Specs Row -->
+              <div class="residence-specs">
+                <div class="residence-spec">
+                  <span class="residence-spec-val" data-dr-field="specs.bedrooms">{property.specs.bedrooms}</span>
+                  <span class="residence-spec-lbl">Bedrooms</span>
+                </div>
+                <div class="residence-spec-divider"></div>
+                <div class="residence-spec">
+                  <span class="residence-spec-val" data-dr-field="specs.bathrooms">{property.specs.bathrooms}</span>
+                  <span class="residence-spec-lbl">Bathrooms</span>
+                </div>
+                <div class="residence-spec-divider"></div>
+                <div class="residence-spec">
+                  <span class="residence-spec-val" data-dr-field="specs.area">{property.specs.area}</span>
+                  <span class="residence-spec-lbl">Area</span>
+                </div>
+              </div>
+
+              <!-- Price + CTA -->
+              <div class="residence-footer">
+                <span class="residence-price" data-dr-field="price" data-dr-style="price">{property.price}</span>
+                <span class="residence-cta">
+                  Explore
+                  <svg class="residence-cta-arrow" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .properties-section {
+    background: var(--background);
+  }
+
+  .residences-section {
+    background: var(--surface);
+    padding: 5rem 0 6rem;
+  }
+
+  .residences-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .residences-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .residences-eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5em;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 1rem;
+  }
+
+  .residences-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 400;
+    color: var(--primary);
+    letter-spacing: 0.04em;
+  }
+
+  .residences-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .residence {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    text-decoration: none;
+    background: var(--background);
+    overflow: hidden;
+    transition: box-shadow 0.5s ease, transform 0.5s ease;
+    cursor: pointer;
+  }
+
+  .residence:hover {
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .residence--reverse {
+    direction: rtl;
+  }
+
+  .residence--reverse > * {
+    direction: ltr;
+  }
+
+  .residence-image-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .residence-image-inner {
+    position: relative;
+    height: 100%;
+    min-height: 400px;
+  }
+
+  .residence-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .residence:hover .residence-img {
+    transform: scale(1.04);
+  }
+
+  .residence-floor {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 0.75rem 1rem;
+  }
+
+  .residence-floor-num {
+    font-family: 'Cinzel', serif;
+    font-size: 1.75rem;
+    color: var(--primary-foreground);
+    letter-spacing: 0.1em;
+    line-height: 1;
+  }
+
+  .residence-floor-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+  }
+
+  .residence-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3rem 3.5rem;
+  }
+
+  .residence-type {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 0.75rem;
+  }
+
+  .residence-name {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 400;
+    color: var(--primary);
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+  }
+
+  .residence-subtitle {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+
+  .residence-specs {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .residence-spec {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .residence-spec-val {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    color: var(--primary);
+    letter-spacing: 0.05em;
+  }
+
+  .residence-spec-lbl {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .residence-spec-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+  }
+
+  .residence-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .residence-price {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    color: var(--primary);
+    letter-spacing: 0.04em;
+  }
+
+  .residence-cta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    font-weight: 300;
+    transition: color 0.3s ease;
+  }
+
+  .residence:hover .residence-cta {
+    color: var(--primary);
+  }
+
+  .residence-cta-arrow {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+  }
+
+  .residence:hover .residence-cta-arrow {
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 768px) {
+    .residence {
+      grid-template-columns: 1fr;
+    }
+
+    .residence--reverse {
+      direction: ltr;
+    }
+
+    .residence-image-inner {
+      min-height: 280px;
+    }
+
+    .residence-info {
+      padding: 2rem 1.5rem 2.5rem;
+    }
+
+    .residence-specs {
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .residence-spec-divider {
+      display: none;
+    }
+  }
+</style>
