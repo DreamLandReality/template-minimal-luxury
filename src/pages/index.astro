@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import MediaShowcase from '../components/MediaShowcase.astro';
+import UnlockPrice from '../components/UnlockPrice.astro';
+import Amenities from '../components/Amenities.astro';
+import Testimonials from '../components/Testimonials.astro';
+import ContactInfo from '../components/ContactInfo.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { getSectionData, isSectionEnabled } from '../lib/manifest-loader';
+
+const seoData = getSectionData('seo');
+const heroData = getSectionData('hero');
+const mediaShowcaseData = getSectionData('media-showcase');
+const unlockPriceData = getSectionData('unlock-price');
+const amenitiesData = getSectionData('amenities');
+const testimonialsData = getSectionData('testimonials');
+const contactInfoData = getSectionData('contact-info');
+const contactFormData = getSectionData('contact-form');
+---
+
+<BaseLayout title={seoData.title} seo={seoData} transparentNav={true}>
+  {isSectionEnabled('hero') && <Hero data={heroData} />}
+  {isSectionEnabled('media-showcase') && <MediaShowcase data={mediaShowcaseData} />}
+  {isSectionEnabled('unlock-price') && <UnlockPrice data={unlockPriceData} />}
+  {isSectionEnabled('amenities') && <Amenities data={amenitiesData} />}
+  {isSectionEnabled('testimonials') && <Testimonials data={testimonialsData} />}
+  {isSectionEnabled('contact-info') && <ContactInfo data={contactInfoData} />}
+  {isSectionEnabled('contact-form') && <ContactForm data={contactFormData} />}
+</BaseLayout>

@@ -1,0 +1,236 @@
+---
+export interface Props {
+  data: {
+    previewState?: 'locked' | 'unlocked';
+    sectionEyebrow?: string;
+    sectionTitle?: string;
+    price: string;
+    priceLabel: string;
+    priceNote?: string;
+    unlockButtonText?: string;
+    showBrochureDownload?: boolean;
+    brochureFile?: string;
+    brochureButtonText?: string;
+    modalHeading?: string;
+    modalSubtext?: string;
+    modalSubmitText?: string;
+    modalSuccessMessage?: string;
+  };
+}
+
+const { data } = Astro.props;
+const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
+const isUnlocked = data.previewState === 'unlocked';
+---
+
+<section class="py-20 px-6 bg-stone-50" data-dr-section="unlock-price">
+  <div class="max-w-4xl mx-auto text-center">
+    {data.sectionEyebrow && (
+      <p class="text-xs uppercase tracking-widest text-muted mb-2" data-dr-field="sectionEyebrow">
+        {data.sectionEyebrow}
+      </p>
+    )}
+    {data.sectionTitle && (
+      <h2 class="text-3xl md:text-4xl font-serif mb-8" data-dr-field="sectionTitle">
+        {data.sectionTitle}
+      </h2>
+    )}
+
+    <div class="mb-8">
+      <p class="text-sm uppercase tracking-wider text-muted mb-2" data-dr-field="priceLabel">
+        {data.priceLabel}
+      </p>
+      
+      <!-- Blurred Price (revealed after form submit) -->
+      <div class="relative mb-4">
+        <p 
+          id="price-display"
+          class="text-4xl md:text-5xl font-serif text-primary transition-all duration-700"
+          style={isUnlocked ? '' : 'filter: blur(14px); user-select: none; pointer-events: none;'}
+          data-dr-field="price"
+        >
+          {data.price}
+        </p>
+        {data.priceNote && (
+          <p
+            id="price-note"
+            class="text-sm text-muted mt-2 transition-all duration-700"
+            style={isUnlocked ? '' : 'filter: blur(8px);'}
+            data-dr-field="priceNote"
+          >
+            {data.priceNote}
+          </p>
+        )}
+      </div>
+
+      <!-- Unlock Button -->
+      <div id="unlock-btn-wrapper" style={isUnlocked ? 'display: none;' : ''}>
+        <button
+          id="unlock-price-btn"
+          class="inline-block px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
+          data-dr-field="unlockButtonText"
+        >
+          {data.unlockButtonText || 'Unlock Price'}
+        </button>
+      </div>
+
+      <!-- Success message (shown after unlock) -->
+      <p
+        id="price-success-msg"
+        class="text-green-600 text-sm font-medium mt-4"
+        style={isUnlocked ? '' : 'display: none;'}
+        data-dr-field="modalSuccessMessage"
+      >
+        {data.modalSuccessMessage || 'Price unlocked successfully!'}
+      </p>
+    </div>
+
+    <!-- Brochure Download (always visible) -->
+    {data.showBrochureDownload && (
+      <div class="mt-8">
+        <a
+          href={data.brochureFile}
+          download
+          class="inline-block px-8 py-3 bg-stone-800 text-white text-sm uppercase tracking-widest hover:bg-stone-700 transition-colors duration-300"
+          data-dr-field="brochureButtonText"
+        >
+          {data.brochureButtonText || 'Download Brochure'}
+        </a>
+      </div>
+    )}
+  </div>
+
+  <!-- Modal (Unlock Price Gate) -->
+  <div
+    id="contact-modal"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center"
+    style={isUnlocked ? 'display: flex;' : 'display: none;'}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-heading"
+  >
+    <div class="bg-surface p-8 max-w-md w-full mx-4 relative border">
+      <button
+        id="modal-close"
+        class="absolute top-4 right-4 text-muted hover:text-primary transition-colors duration-200"
+        aria-label="Close"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <h3 
+        id="modal-heading"
+        class="text-2xl font-serif mb-2" 
+        data-dr-field="modalHeading"
+      >
+        {data.modalHeading || 'Unlock Pricing'}
+      </h3>
+      <p class="text-sm text-muted mb-6" data-dr-field="modalSubtext">
+        {data.modalSubtext || 'Please provide your details to unlock the full pricing information.'}
+      </p>
+
+      <form id="unlock-form" class="space-y-4" novalidate>
+        <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          required
+          class="w-full px-4 py-3 border border-border bg-background text-primary placeholder-muted focus:outline-none focus:border-primary transition-colors duration-200"
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email Address"
+          required
+          class="w-full px-4 py-3 border border-border bg-background text-primary placeholder-muted focus:outline-none focus:border-primary transition-colors duration-200"
+        />
+        <input
+          type="tel"
+          name="phone"
+          placeholder="Phone Number"
+          class="w-full px-4 py-3 border border-border bg-background text-primary placeholder-muted focus:outline-none focus:border-primary transition-colors duration-200"
+        />
+        <button
+          type="submit"
+          class="w-full px-8 py-3 bg-primary text-primary-foreground text-sm uppercase tracking-widest hover:bg-primary/90 transition-colors duration-300"
+          data-dr-field="modalSubmitText"
+        >
+          {data.modalSubmitText || 'Unlock Now'}
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+(function () {
+  var unlockBtn = document.getElementById('unlock-price-btn');
+  var modal = document.getElementById('contact-modal');
+  var modalClose = document.getElementById('modal-close');
+  var form = document.getElementById('unlock-form');
+  var priceDisplay = document.getElementById('price-display');
+  var priceNote = document.getElementById('price-note');
+  var unlockBtnWrapper = document.getElementById('unlock-btn-wrapper');
+  var successMsg = document.getElementById('price-success-msg');
+
+  function openModal() {
+    if (modal) { 
+      modal.style.display = 'flex'; 
+      document.body.style.overflow = 'hidden'; 
+    }
+  }
+
+  function closeModal() {
+    if (modal) { 
+      modal.style.display = 'none'; 
+      document.body.style.overflow = ''; 
+    }
+  }
+
+  function revealPrice() {
+    if (priceDisplay) { 
+      priceDisplay.style.filter = 'none'; 
+      priceDisplay.style.pointerEvents = ''; 
+      priceDisplay.style.userSelect = '';
+    }
+    if (priceNote) priceNote.style.filter = 'none';
+    if (unlockBtnWrapper) unlockBtnWrapper.style.display = 'none';
+    if (successMsg) successMsg.style.display = '';
+    closeModal();
+  }
+
+  unlockBtn && unlockBtn.addEventListener('click', openModal);
+  modalClose && modalClose.addEventListener('click', closeModal);
+
+  // Backdrop click
+  modal && modal.addEventListener('click', function (e) {
+    if (e.target === modal) closeModal();
+  });
+
+  // Escape key
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal && modal.style.display === 'flex') closeModal();
+  });
+
+  form && form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nameEl = form.querySelector('[name="name"]');
+    var emailEl = form.querySelector('[name="email"]');
+    var name = nameEl ? nameEl.value.trim() : '';
+    var email = emailEl ? emailEl.value.trim() : '';
+
+    if (!name) { 
+      if (nameEl) nameEl.style.borderColor = '#ef4444'; 
+      return; 
+    }
+    if (!email || !email.includes('@')) { 
+      if (emailEl) emailEl.style.borderColor = '#ef4444'; 
+      return; 
+    }
+
+    revealPrice();
+  });
+})();
+</script>

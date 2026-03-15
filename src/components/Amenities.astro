@@ -1,0 +1,48 @@
+---
+export interface Props {
+  data: {
+    sectionEyebrow?: string;
+    sectionTitle?: string;
+    items: Array<{
+      icon: string;
+      title: string;
+      description: string;
+    }>;
+  };
+}
+
+const { data } = Astro.props;
+---
+
+<section class="py-20 px-6" data-dr-section="amenities">
+  <div class="max-w-6xl mx-auto">
+    {data.sectionEyebrow && (
+      <p class="text-xs uppercase tracking-widest text-muted mb-2 text-center" data-dr-field="sectionEyebrow">
+        {data.sectionEyebrow}
+      </p>
+    )}
+    {data.sectionTitle && (
+      <h2 class="text-3xl md:text-4xl font-serif text-center mb-12" data-dr-field="sectionTitle">
+        {data.sectionTitle}
+      </h2>
+    )}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" data-dr-list="amenities">
+      {data.items.map((item, index) => (
+        <div class="text-center" data-dr-list-item data-dr-index={index}>
+          <div class="inline-flex items-center justify-center w-16 h-16 mb-4 text-primary">
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-dr-field="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={item.icon} />
+            </svg>
+          </div>
+          <h3 class="text-lg font-serif mb-2" data-dr-field="title">
+            {item.title}
+          </h3>
+          <p class="text-sm text-muted" data-dr-field="description">
+            {item.description}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

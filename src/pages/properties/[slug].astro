@@ -1,0 +1,237 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PropertyCTA from '../../components/PropertyCTA.astro';
+import { getSectionData } from '../../lib/manifest-loader';
+
+export function getStaticPaths() {
+  const propertiesData = getSectionData<any>('properties');
+  // Support both new object-with-items and legacy flat array
+  const items = Array.isArray(propertiesData) ? propertiesData : (propertiesData.items ?? []);
+  const labels = getSectionData<any>('property-detail-labels') ?? {};
+  return items.map((property: any) => ({
+    params: { slug: property.slug },
+    props: { property, labels },
+  }));
+}
+
+const { property, labels } = Astro.props;
+const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`
+
+const seoData = getSectionData('seo');
+const pageSeo = {
+  ...seoData,
+  title: `${property.title} | ${seoData.title}`,
+  description: (property.description ?? '').slice(0, 160),
+};
+---
+
+<BaseLayout title={pageSeo.title} seo={pageSeo} transparentNav={true}>
+  <div data-dr-section="property-details">
+    <!-- Hero Banner -->
+    <section class="relative h-[70vh] flex items-end overflow-hidden" data-dr-section="detail:core">
+      <div class="absolute inset-0 z-0">
+        <img
+          src={imgSrc(property.thumbnail)}
+          alt={property.title}
+          width="1920"
+          height="1080"
+          class="w-full h-full object-cover"
+          loading="eager"
+          fetchpriority="high"
+          data-dr-field="thumbnail"
+        />
+        <!-- Adding dark overlay at top for navbar visibility, and bottom for text readability -->
+        <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
+      </div>
+
+      <div class="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12 pb-12 md:pb-16">
+        <span class="inline-block px-3 py-1 text-[10px] uppercase tracking-[0.3em] font-light bg-surface/15 backdrop-blur-sm text-primary-foreground border border-white/20 mb-4" data-dr-field="type" data-dr-style="type">
+          {property.type}
+        </span>
+        <h1 class="text-4xl md:text-6xl font-serif tracking-wide text-primary-foreground mb-2" data-dr-field="title" data-dr-style="title">
+          {property.title}
+        </h1>
+        <p class="text-sm md:text-base text-primary-foreground/70 font-light tracking-widest uppercase" data-dr-field="subtitle" data-dr-style="subtitle">
+          {property.subtitle}
+        </p>
+      </div>
+    </section>
+
+    <!-- Specs Bar -->
+    <section class="bg-surface border-b border-border" data-dr-section="detail:specs">
+      <div class="max-w-7xl mx-auto px-6 md:px-12 py-6">
+        <div class="flex flex-wrap items-center justify-between gap-6">
+          <div class="flex flex-wrap items-center gap-8 md:gap-12">
+            <div class="spec-item">
+              <span class="spec-value" data-dr-field="specs.bedrooms">{property.specs.bedrooms}</span>
+              <span class="spec-label">Bedrooms</span>
+            </div>
+            <div class="spec-divider"></div>
+            <div class="spec-item">
+              <span class="spec-value" data-dr-field="specs.bathrooms">{property.specs.bathrooms}</span>
+              <span class="spec-label">Bathrooms</span>
+            </div>
+            <div class="spec-divider"></div>
+            <div class="spec-item">
+              <span class="spec-value" data-dr-field="specs.area">{property.specs.area}</span>
+              <span class="spec-label">Living Area</span>
+            </div>
+            <div class="spec-divider"></div>
+            <div class="spec-item">
+              <span class="spec-value" data-dr-field="specs.parking">{property.specs.parking}</span>
+              <span class="spec-label">Parking</span>
+            </div>
+          </div>
+          <div class="text-2xl md:text-3xl font-serif text-primary tracking-wide" data-dr-field="price" data-dr-style="price">
+            {property.price}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Description -->
+    <section class="py-16 md:py-24 bg-background" data-dr-section="detail:details">
+      <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-20">
+          <!-- Description Text -->
+          <div class="lg:col-span-3" data-dr-section="detail:about">
+            <p class="text-[11px] uppercase tracking-[0.4em] text-muted font-light mb-4" data-dr-field="aboutLabel">
+              {labels.aboutLabel ?? 'About This Property'}
+            </p>
+            <h2 class="text-2xl md:text-3xl font-serif text-primary tracking-wide mb-8" data-dr-field="aboutTitle" data-dr-style="aboutTitle">
+              {property.title}
+            </h2>
+            <p class="text-muted leading-relaxed text-base md:text-lg font-light" data-dr-field="description" data-dr-style="description">
+              {property.description}
+            </p>
+            <div class="mt-8 text-sm text-primary font-light">
+              <div class="flex items-center gap-2 mb-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span data-dr-field="location.address" data-dr-style="location.address">{property.location?.address}</span>
+              </div>
+              <span class="ml-6" data-dr-field="location.city" data-dr-style="location.city">{property.location?.city}</span>
+            </div>
+          </div>
+
+          <!-- Amenities -->
+          <div class="lg:col-span-2" data-dr-section="detail:amenities">
+            <p class="text-[11px] uppercase tracking-[0.4em] text-muted font-light mb-4" data-dr-field="amenitiesLabel">
+              {labels.amenitiesLabel ?? 'Features & Amenities'}
+            </p>
+            <ul class="space-y-3" data-dr-list="amenities">
+              {(property.amenities ?? []).map((amenity: string) => (
+                <li class="flex items-center gap-3 text-muted font-light" data-dr-list-item>
+                  <span class="w-1.5 h-1.5 rounded-full bg-border flex-shrink-0"></span>
+                  <span data-dr-field="amenity" data-dr-style="amenity">{amenity}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Image Gallery -->
+    <section class="py-16 md:py-24 bg-surface" data-dr-section="detail:gallery">
+      <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <p class="text-[11px] uppercase tracking-[0.4em] text-muted font-light mb-4 text-center" data-dr-field="galleryLabel">
+          {labels.galleryLabel ?? 'Gallery'}
+        </p>
+        <h2 class="text-2xl md:text-3xl font-serif text-primary tracking-wide mb-12 text-center" data-dr-field="galleryHeading">
+          {labels.galleryHeading ?? 'Explore the Spaces'}
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-dr-list="gallery">
+          {property.gallery.map((image: { src: string; alt: string }, index: number) => (
+            <div class={`gallery-item overflow-hidden ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''}`} data-dr-list-item>
+              <img
+                src={imgSrc(image.src)}
+                alt={image.alt}
+                width="800"
+                height="600"
+                class={`w-full h-full object-cover transition-transform duration-700 hover:scale-105 ${index === 0 ? 'aspect-[16/10]' : 'aspect-[4/3]'}`}
+                loading="lazy"
+                data-dr-field="src"
+              />
+              <p class="text-[10px] uppercase tracking-widest text-muted font-light text-center mt-2 px-1" data-dr-field="alt">
+                {image.alt}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Floor Plan -->
+    <section class="py-16 md:py-24 bg-background" data-dr-section="detail:floorplan">
+      <div class="max-w-5xl mx-auto px-6 md:px-12">
+        <div class="text-center mb-12">
+          <p class="text-[11px] uppercase tracking-[0.4em] text-muted font-light mb-4" data-dr-field="layoutLabel">
+            {labels.layoutLabel ?? 'Layout'}
+          </p>
+          <h2 class="text-2xl md:text-3xl font-serif text-primary tracking-wide" data-dr-field="floorPlanHeading">
+            {labels.floorPlanHeading ?? 'Floor Plan'}
+          </h2>
+        </div>
+        <div class="bg-surface p-4 md:p-8 shadow-sm">
+          <img
+            src={imgSrc(property.floorPlan)}
+            alt={`Floor plan for ${property.title}`}
+            width="1200"
+            height="900"
+            class="w-full h-auto"
+            loading="lazy"
+            data-dr-field="floorPlan"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <div data-dr-section="detail:cta">
+      <PropertyCTA labels={labels} propertyTitle={property.title} />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .spec-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .spec-value {
+    font-family: 'Cinzel', serif;
+    font-size: 1.25rem;
+    color: #1c1917;
+    letter-spacing: 0.05em;
+  }
+
+  .spec-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #a8a29e;
+    font-weight: 300;
+  }
+
+  .spec-divider {
+    width: 1px;
+    height: 32px;
+    background: #e7e5e4;
+  }
+
+  @media (max-width: 768px) {
+    .spec-divider {
+      display: none;
+    }
+  }
+
+  .gallery-item {
+    cursor: pointer;
+  }
+</style>

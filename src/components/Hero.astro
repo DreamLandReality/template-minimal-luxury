@@ -1,0 +1,140 @@
+---
+export interface Props {
+  data: {
+    heroMediaType?: 'image' | 'carousel' | 'video';
+    headline: string;
+    subtext: string;
+    backgroundImage?: string;
+    backgroundImageCarousel?: string[];
+    heroVideo?: string;
+    videoAutoplay?: boolean;
+    videoMuted?: boolean;
+    backgroundImageAlt: string;
+    cta?: { text: string; href: string };
+  };
+}
+
+const { data } = Astro.props;
+const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
+const mediaType = data.heroMediaType || 'image';
+
+// Determine what to render based on mediaType
+const renderVideo = mediaType === 'video';
+const renderCarousel = mediaType === 'carousel' && data.backgroundImageCarousel && data.backgroundImageCarousel.length > 0;
+const renderImage = !renderVideo && !renderCarousel;
+---
+
+<section class="relative h-screen flex items-center justify-center overflow-hidden" data-dr-section="hero">
+  <!-- Hidden field for media type detection -->
+  <input type="hidden" data-dr-field="heroMediaType" value={mediaType} />
+  
+  <!-- Background Media -->
+  <div class="absolute inset-0 z-0" data-dr-media-container="hero">
+    {renderVideo && (
+      <div class="relative w-full h-full">
+        <!-- Video Loading Skeleton -->
+        <div 
+          id="video-skeleton" 
+          class="absolute inset-0 bg-stone-200 animate-pulse flex items-center justify-center"
+        >
+          <div class="w-16 h-16 border-4 border-stone-300 border-t-stone-600 rounded-full animate-spin"></div>
+        </div>
+        
+        <!-- Video Element -->
+        <video
+          src={imgSrc(data.heroVideo || 'defaults/demo-video.mp4')}
+          autoplay={data.videoAutoplay !== false}
+          muted={data.videoMuted !== false}
+          loop
+          playsinline
+          class="w-full h-full object-cover opacity-0 transition-opacity duration-500"
+          data-dr-field="heroVideo"
+          onloadeddata="this.style.opacity='1'; document.getElementById('video-skeleton').style.display='none';"
+          oncanplay="this.style.opacity='1'; document.getElementById('video-skeleton').style.display='none';"
+        />
+      </div>
+    )}
+    
+    {renderCarousel && (
+      <div class="hero-carousel w-full h-full relative" data-dr-field="backgroundImageCarousel" data-dr-type="array">
+        {data.backgroundImageCarousel!.map((img, index) => (
+          <img
+            key={index}
+            src={imgSrc(img)}
+            alt={`${data.backgroundImageAlt} ${index + 1}`}
+            width="1920"
+            height="1080"
+            class={`absolute inset-0 w-full h-full object-cover grayscale opacity-90 transition-opacity duration-1000 ${index === 0 ? 'carousel-active' : 'opacity-0'}`}
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchpriority={index === 0 ? 'high' : 'auto'}
+            data-dr-index={index}
+            data-dr-type="array-item"
+          />
+        ))}
+      </div>
+    )}
+    
+    {renderImage && (
+      <img
+        src={imgSrc(data.backgroundImage || 'defaults/default-hero.jpg')}
+        alt={data.backgroundImageAlt}
+        width="1920"
+        height="1080"
+        class="w-full h-full object-cover grayscale opacity-90"
+        loading="eager"
+        fetchpriority="high"
+        data-dr-field="backgroundImage"
+      />
+    )}
+    
+    <div class="absolute inset-0 bg-black/40 pointer-events-none"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10 text-center px-6 max-w-4xl mx-auto text-primary-foreground">
+    <h1 class="text-5xl md:text-7xl font-serif mb-6 tracking-wide leading-tight" data-dr-field="headline" data-dr-style="headline">
+      {data.headline}
+    </h1>
+    <p class="text-lg md:text-xl font-light tracking-widest uppercase opacity-90 mb-8" data-dr-field="subtext" data-dr-style="subtext">
+      {data.subtext}
+    </p>
+    <!-- CTA — always rendered so data-dr-field target always exists in DOM -->
+    <a
+      href={data.cta?.href || '#contact'}
+      class={`inline-block px-8 py-3 bg-surface/10 backdrop-blur-sm border border-white/20 text-primary-foreground text-sm uppercase tracking-widest hover:bg-surface/20 transition-colors duration-300 ${!data.cta ? 'hidden' : ''}`}
+      data-dr-field="cta.text"
+    >
+      {data.cta?.text || 'View Properties'}
+    </a>
+  </div>
+</section>
+
+<script>
+  // Auto-rotate carousel images
+  function initCarousel() {
+    const carousel = document.querySelector('.hero-carousel');
+    if (!carousel) return;
+
+    const images = carousel.querySelectorAll('img');
+    if (images.length <= 1) return;
+
+    let currentIndex = 0;
+    
+    setInterval(() => {
+      images[currentIndex].classList.remove('carousel-active');
+      images[currentIndex].classList.add('opacity-0');
+      
+      currentIndex = (currentIndex + 1) % images.length;
+      
+      images[currentIndex].classList.add('carousel-active');
+      images[currentIndex].classList.remove('opacity-0');
+    }, 5000); // Change image every 5 seconds
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCarousel);
+  } else {
+    initCarousel();
+  }
+</script>

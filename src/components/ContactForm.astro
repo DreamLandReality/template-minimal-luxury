@@ -1,0 +1,120 @@
+---
+export interface Props {
+  data: {
+    heading: string;
+    subtext?: string | null;
+    submitButton: string;
+    successMessage: string;
+    submissionEndpoint?: string | null;
+    siteToken?: string | null;
+  };
+}
+
+const { data } = Astro.props;
+---
+
+<section class="py-24 bg-background" data-dr-section="contact-form">
+  <div class="max-w-2xl mx-auto px-6 text-center">
+    <h2 class="text-3xl font-serif text-primary mb-4" data-dr-field="heading" data-dr-style="heading">{data.heading}</h2>
+    <p class="text-muted text-sm uppercase tracking-widest mb-12" data-dr-field="subtext" data-dr-style="subtext"
+       style={!data.subtext ? 'display:none' : undefined}>{data.subtext}</p>
+
+    <form class="space-y-6 text-left" data-endpoint={data.submissionEndpoint || undefined} data-token={data.siteToken || undefined} data-success={data.successMessage} id="contact-form">
+      <div>
+        <label for="contact-name" class="block text-xs uppercase tracking-widest text-muted mb-2">Name</label>
+        <input type="text" name="name" id="contact-name" required class="w-full bg-transparent border-b border-border py-2 focus:outline-none focus:border-primary transition-colors" />
+      </div>
+      <div>
+        <label for="contact-email" class="block text-xs uppercase tracking-widest text-muted mb-2">Email</label>
+        <input type="email" name="email" id="contact-email" required class="w-full bg-transparent border-b border-border py-2 focus:outline-none focus:border-primary transition-colors" />
+      </div>
+      <div>
+        <label for="contact-phone" class="block text-xs uppercase tracking-widest text-muted mb-2">Phone</label>
+        <input type="tel" name="phone" id="contact-phone" class="w-full bg-transparent border-b border-border py-2 focus:outline-none focus:border-primary transition-colors" />
+      </div>
+      <div>
+        <label for="contact-message" class="block text-xs uppercase tracking-widest text-muted mb-2">Message</label>
+        <textarea name="message" id="contact-message" rows="4" class="w-full bg-transparent border-b border-border py-2 focus:outline-none focus:border-primary transition-colors"></textarea>
+      </div>
+
+      <!-- Honeypot field - spam protection -->
+      <div style="position: absolute; left: -9999px;" aria-hidden="true">
+        <input type="text" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="pt-6 text-center">
+        <button type="submit" class="bg-primary text-primary-foreground px-8 py-3 text-sm uppercase tracking-widest hover:bg-border transition-colors" data-dr-field="submitButton">
+          {data.submitButton}
+        </button>
+      </div>
+      <p class="form-status text-center text-sm mt-4 text-muted hidden" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = form.querySelector('.form-status') as HTMLElement;
+      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const successMessage = form.dataset.success || 'Thank you! We will contact you soon.';
+
+      if (status) status.classList.remove('hidden');
+      if (status) status.textContent = 'Sending...';
+      if (submitBtn) submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+      const data: Record<string, string> = {};
+      formData.forEach((value, key) => {
+        // Strip honeypot from payload
+        if (key !== 'website') {
+          data[key] = value as string;
+        }
+      });
+
+      // Client-side honeypot check — silently pretend success
+      const honeypot = (formData.get('website') as string) || '';
+      if (honeypot.trim() !== '') {
+        setTimeout(() => {
+          if (status) status.textContent = successMessage;
+          if (submitBtn) submitBtn.disabled = false;
+          form.reset();
+        }, 1000);
+        return;
+      }
+
+      // Add siteToken if it exists in dataset
+      if (form.dataset.token) {
+        data.siteToken = form.dataset.token;
+      }
+
+      // Dev mode — no endpoint available
+      if (!form.dataset.endpoint) {
+        setTimeout(() => {
+          if (status) status.textContent = 'Form submission is not available in preview mode.';
+          if (submitBtn) submitBtn.disabled = false;
+          form.reset();
+        }, 1000);
+        return;
+      }
+
+      try {
+        const res = await fetch(form.dataset.endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+        if (status) status.textContent = res.ok ? successMessage : (result.error || 'Something went wrong.');
+        if (res.ok) form.reset();
+      } catch (err) {
+        if (status) status.textContent = 'Something went wrong.';
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+</script>
