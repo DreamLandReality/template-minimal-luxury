@@ -1,0 +1,112 @@
+---
+export interface Props {
+  data: {
+    sectionEyebrow?: string;
+    sectionTitle?: string;
+    mediaType: 'image' | 'video' | '3d-image' | '3d-video';
+    mediaFile: string;
+    videoAutoplay?: boolean;
+    videoMuted?: boolean;
+    mediaAlt?: string;
+    caption?: string;
+  };
+}
+
+const { data } = Astro.props;
+const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
+
+const isImage = data.mediaType === 'image';
+const isVideo = data.mediaType === 'video';
+const is3D = data.mediaType === '3d-image' || data.mediaType === '3d-video';
+---
+
+<section class="py-24 px-8 md:px-12" data-dr-section="media-showcase">
+  <div class="max-w-7xl mx-auto">
+    {(data.sectionEyebrow || data.sectionTitle) && (
+      <div class="mb-10">
+        {data.sectionEyebrow && (
+          <p class="text-[10px] uppercase tracking-[0.4em] text-muted mb-3" data-dr-field="sectionEyebrow">
+            {data.sectionEyebrow}
+          </p>
+        )}
+        {data.sectionTitle && (
+          <h2 class="text-3xl md:text-4xl font-serif font-light" data-dr-field="sectionTitle">
+            {data.sectionTitle}
+          </h2>
+        )}
+      </div>
+    )}
+
+    <div class="relative w-full aspect-video bg-surface overflow-hidden border border-border">
+
+      <!-- ═══ Image Mode ═══ -->
+      <div
+        data-dr-show-when="media-showcase.mediaType=image"
+        style={isImage ? '' : 'display:none'}
+        class="w-full h-full"
+      >
+        <img
+          src={imgSrc(data.mediaFile || 'defaults/default-hero.jpg')}
+          alt={data.mediaAlt || 'Media showcase'}
+          class="w-full h-full object-cover"
+          data-dr-field="mediaFile"
+        />
+      </div>
+
+      <!-- ═══ Video Mode ═══ -->
+      <div
+        data-dr-show-when="media-showcase.mediaType=video"
+        style={isVideo ? '' : 'display:none'}
+        class="relative w-full h-full"
+      >
+        <!-- Video Loading Skeleton -->
+        <div
+          id="media-video-skeleton"
+          class="absolute inset-0 bg-surface animate-pulse flex items-center justify-center"
+        >
+          <div class="w-12 h-12 border-2 border-border border-t-muted rounded-full animate-spin"></div>
+        </div>
+
+        <!-- Video Element -->
+        <video
+          src={imgSrc(data.mediaFile || 'defaults/demo-video.mp4')}
+          autoplay={data.videoAutoplay === true}
+          muted={data.videoMuted !== false}
+          controls
+          class="w-full h-full object-cover opacity-0 transition-opacity duration-500"
+          data-dr-field="mediaFile"
+          onloadeddata="this.style.opacity='1'; document.getElementById('media-video-skeleton').style.display='none';"
+          oncanplay="this.style.opacity='1'; document.getElementById('media-video-skeleton').style.display='none';"
+        >
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <!-- ═══ 3D Mode (3d-image and 3d-video) ═══ -->
+      <div
+        data-dr-show-when="media-showcase.mediaType=3d-image|media-showcase.mediaType=3d-video"
+        style={is3D ? '' : 'display:none'}
+        class="w-full h-full"
+      >
+        <model-viewer
+          src={imgSrc(data.mediaFile)}
+          alt={data.mediaAlt || 'Interactive 3D model'}
+          auto-rotate
+          camera-controls
+          class="w-full h-full"
+          data-dr-field="mediaFile"
+        ></model-viewer>
+      </div>
+
+    </div>
+
+    {data.caption && (
+      <p class="text-[11px] uppercase tracking-[0.25em] text-muted mt-5" data-dr-field="caption">
+        {data.caption}
+      </p>
+    )}
+  </div>
+</section>
+
+<!-- Always include model-viewer script (lazy, only activates when element is visible) -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>

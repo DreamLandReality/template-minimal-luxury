@@ -1,0 +1,236 @@
+---
+export interface Props {
+  data: {
+    heading: string;
+    subtext?: string | null;
+    submitButton: string;
+    successMessage: string;
+    submissionEndpoint?: string | null;
+    siteToken?: string | null;
+    supabaseAnonKey?: string | null;
+  };
+}
+
+const { data } = Astro.props;
+---
+
+<section class="contact-form-section py-24 bg-primary" data-dr-section="contact-form">
+  <div class="max-w-7xl mx-auto px-8 md:px-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-start">
+
+      <!-- Left: heading -->
+      <div class="md:pt-2">
+        <p class="cf-label text-[10px] uppercase tracking-[0.4em] mb-5">
+          Get In Touch
+        </p>
+        <h2
+          class="cf-heading text-4xl md:text-5xl font-serif font-light leading-[1.1] mb-6"
+          data-dr-field="heading"
+          data-dr-style="heading"
+        >
+          {data.heading}
+        </h2>
+        {data.subtext && (
+          <p
+            class="cf-subtext text-sm font-light leading-relaxed tracking-wide max-w-xs"
+            data-dr-field="subtext"
+            data-dr-style="subtext"
+          >
+            {data.subtext}
+          </p>
+        )}
+      </div>
+
+      <!-- Right: form -->
+      <div>
+        <form
+          class="space-y-8"
+          data-endpoint={data.submissionEndpoint || undefined}
+          data-token={data.siteToken || undefined}
+          data-apikey={data.supabaseAnonKey || undefined}
+          data-success={data.successMessage}
+          id="contact-form"
+        >
+          <div>
+            <label for="contact-name" class="cf-field-label block text-[10px] uppercase tracking-[0.3em] mb-3">
+              Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="contact-name"
+              required
+              class="cf-input w-full bg-transparent py-2.5 focus:outline-none transition-colors text-sm"
+            />
+          </div>
+          <div>
+            <label for="contact-email" class="cf-field-label block text-[10px] uppercase tracking-[0.3em] mb-3">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="contact-email"
+              required
+              class="cf-input w-full bg-transparent py-2.5 focus:outline-none transition-colors text-sm"
+            />
+          </div>
+          <div>
+            <label for="contact-phone" class="cf-field-label block text-[10px] uppercase tracking-[0.3em] mb-3">
+              Phone
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              id="contact-phone"
+              class="cf-input w-full bg-transparent py-2.5 focus:outline-none transition-colors text-sm"
+            />
+          </div>
+          <div>
+            <label for="contact-message" class="cf-field-label block text-[10px] uppercase tracking-[0.3em] mb-3">
+              Message
+            </label>
+            <textarea
+              name="message"
+              id="contact-message"
+              rows="3"
+              class="cf-input w-full bg-transparent py-2.5 focus:outline-none transition-colors text-sm resize-none"
+            ></textarea>
+          </div>
+
+          <!-- Honeypot field - spam protection -->
+          <div style="position: absolute; left: -9999px;" aria-hidden="true">
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="pt-2">
+            <button
+              type="submit"
+              class="cf-submit inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] pb-1 transition-colors duration-300"
+              data-dr-field="submitButton"
+            >
+              {data.submitButton}
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </button>
+          </div>
+          <p class="form-status cf-status text-sm mt-4 hidden" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Use explicit rgba values — Tailwind opacity modifiers fail on CSS hex variables */
+  .contact-form-section .cf-label,
+  .contact-form-section .cf-field-label {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .contact-form-section .cf-heading {
+    color: var(--primary-foreground);
+  }
+
+  .contact-form-section .cf-subtext {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .contact-form-section .cf-input {
+    color: var(--primary-foreground);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .contact-form-section .cf-input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+  }
+
+  .contact-form-section .cf-input:focus {
+    border-bottom-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .contact-form-section .cf-submit {
+    color: var(--primary-foreground);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .contact-form-section .cf-submit:hover {
+    border-bottom-color: var(--primary-foreground);
+  }
+
+  .contact-form-section .cf-status {
+    color: rgba(255, 255, 255, 0.6);
+  }
+</style>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = form.querySelector('.form-status') as HTMLElement;
+      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const successMessage = form.dataset.success || 'Thank you! We will contact you soon.';
+
+      if (status) status.classList.remove('hidden');
+      if (status) status.textContent = 'Sending...';
+      if (submitBtn) submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+
+      const honeypot = (formData.get('website') as string) || '';
+      if (honeypot.trim() !== '') {
+        setTimeout(() => {
+          if (status) status.textContent = successMessage;
+          if (submitBtn) submitBtn.disabled = false;
+          form.reset();
+        }, 1000);
+        return;
+      }
+
+      const data: Record<string, string> = {
+        name: ((formData.get('name') as string) || '').trim(),
+        email: ((formData.get('email') as string) || '').trim(),
+        phone: ((formData.get('phone') as string) || '').trim(),
+        message: ((formData.get('message') as string) || '').trim(),
+        source_url: window.location.href,
+        form_type: 'contact',
+      };
+
+      if (form.dataset.token) {
+        data.siteToken = form.dataset.token;
+      }
+
+      if (!form.dataset.endpoint) {
+        setTimeout(() => {
+          if (status) status.textContent = 'Form submission is not available in preview mode.';
+          if (submitBtn) submitBtn.disabled = false;
+          form.reset();
+        }, 1000);
+        return;
+      }
+
+      try {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (form.dataset.apikey) {
+          headers['apikey'] = form.dataset.apikey;
+          headers['Authorization'] = `Bearer ${form.dataset.apikey}`;
+        }
+        const res = await fetch(form.dataset.endpoint, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+        if (status) status.textContent = res.ok ? successMessage : (result.error || 'Something went wrong.');
+        if (res.ok) form.reset();
+      } catch (err) {
+        if (status) status.textContent = 'Something went wrong.';
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+</script>

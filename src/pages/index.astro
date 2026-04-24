@@ -1,0 +1,140 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import MediaShowcase from '../components/MediaShowcase.astro';
+import UnlockPrice from '../components/UnlockPrice.astro';
+import Amenities from '../components/Amenities.astro';
+import Testimonials from '../components/Testimonials.astro';
+import Brochure from '../components/Brochure.astro';
+import ContactInfo from '../components/ContactInfo.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { getSectionData, isSectionEnabled } from '../lib/manifest-loader';
+
+type SeoData = {
+  title?: string;
+  language?: string;
+};
+
+type HeroData = {
+  heroType?: 'image' | 'carousel' | 'video';
+  headline: string;
+  subtext: string;
+  backgroundImage?: string;
+  images?: { src: string; alt: string }[];
+  heroVideo?: string;
+  videoAutoplay?: boolean;
+  videoMuted?: boolean;
+  backgroundImageAlt: string;
+  ctaText?: string;
+  mobileLayout?: 'fullscreen' | 'auto';
+  overlayEnabled?: boolean;
+};
+
+type MediaShowcaseData = {
+  sectionEyebrow?: string;
+  sectionTitle?: string;
+  mediaType: 'image' | 'video' | '3d-image' | '3d-video';
+  mediaFile: string;
+  videoAutoplay?: boolean;
+  videoMuted?: boolean;
+  mediaAlt?: string;
+  caption?: string;
+};
+
+type UnlockPriceData = {
+  previewState?: 'locked' | 'modal' | 'unlocked';
+  sectionEyebrow?: string;
+  sectionTitle?: string;
+  price: string;
+  priceLabel: string;
+  priceNote?: string;
+  unlockButtonText?: string;
+  showBrochureDownload?: boolean;
+  brochureFile?: string;
+  brochureButtonText?: string;
+  modalHeading?: string;
+  modalSubtext?: string;
+  modalSubmitText?: string;
+  modalSuccessMessage?: string;
+  submissionEndpoint?: string | null;
+  siteToken?: string | null;
+  supabaseAnonKey?: string | null;
+};
+
+type AmenitiesData = {
+  sectionEyebrow?: string;
+  sectionTitle?: string;
+  items: {
+    icon: string;
+    label: string;
+    description: string;
+  }[];
+};
+
+type TestimonialsData = {
+  sectionEyebrow?: string;
+  sectionTitle?: string;
+  items: {
+    name: string;
+    photo?: string;
+    text: string;
+    rating: number;
+  }[];
+};
+
+type BrochureData = {
+  eyebrow?: string;
+  heading?: string;
+  body?: string;
+  buttonText?: string;
+  brochureFile?: string;
+  backgroundImage?: string;
+  backgroundImageAlt?: string;
+};
+
+type ContactInfoData = {
+  sectionEyebrow?: string;
+  sectionTitle?: string;
+  enablePhone?: boolean;
+  phone?: string;
+  enableWhatsApp?: boolean;
+  whatsapp?: string;
+  whatsappLink?: string;
+  enableEmail?: boolean;
+  email?: string;
+  emailLink?: string;
+  enableMap?: boolean;
+  mapEmbedUrl?: string;
+};
+
+type ContactFormData = {
+  heading: string;
+  subtext?: string | null;
+  submitButton: string;
+  successMessage: string;
+  submissionEndpoint?: string | null;
+  siteToken?: string | null;
+  supabaseAnonKey?: string | null;
+};
+
+const seoData = getSectionData<SeoData>('seo');
+const heroData = getSectionData<HeroData>('hero');
+const mediaShowcaseData = getSectionData<MediaShowcaseData>('media-showcase');
+const unlockPriceData = getSectionData<UnlockPriceData>('price-unlock');
+const amenitiesData = getSectionData<AmenitiesData>('amenities');
+const testimonialsData = getSectionData<TestimonialsData>('testimonials');
+const brochureData = getSectionData<BrochureData>('brochure');
+const contactInfoData = getSectionData<ContactInfoData>('contact-info');
+const contactFormData = getSectionData<ContactFormData>('contact-form');
+---
+
+<BaseLayout title={seoData.title || 'Luxury Residences'} seo={seoData} transparentNav={true}>
+  {isSectionEnabled('hero') && <Hero data={heroData} />}
+  {isSectionEnabled('media-showcase') && <MediaShowcase data={mediaShowcaseData} />}
+  {isSectionEnabled('price-unlock') && <UnlockPrice data={unlockPriceData} />}
+  {isSectionEnabled('amenities') && <Amenities data={amenitiesData} />}
+  {isSectionEnabled('testimonials') && <Testimonials data={testimonialsData} />}
+  {isSectionEnabled('brochure') && <Brochure data={brochureData} />}
+  {isSectionEnabled('contact-info') && <ContactInfo data={contactInfoData} />}
+  {isSectionEnabled('contact-form') && <ContactForm data={contactFormData} />}
+</BaseLayout>

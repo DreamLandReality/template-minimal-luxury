@@ -1,0 +1,467 @@
+---
+export interface Props {
+  data: {
+    heroType?: 'image' | 'carousel' | 'video';
+    headline: string;
+    subtext: string;
+    backgroundImage?: string;
+    images?: { src: string; alt: string }[];
+    heroVideo?: string;
+    videoAutoplay?: boolean;
+    videoMuted?: boolean;
+    backgroundImageAlt: string;
+    ctaText?: string;
+    mobileLayout?: 'fullscreen' | 'auto';
+    overlayEnabled?: boolean;
+  };
+}
+
+const { data } = Astro.props;
+const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
+const mediaType = data.heroType || 'image';
+
+const isImage = mediaType === 'image';
+const isCarousel = mediaType === 'carousel';
+const isVideo = mediaType === 'video';
+
+const carouselImages = data.images?.length
+  ? data.images
+  : [{ src: data.backgroundImage || 'defaults/default-hero.jpg', alt: 'Hero' }];
+
+const mobileLayout = data.mobileLayout || 'fullscreen';
+const overlayEnabled = data.overlayEnabled !== false;
+---
+
+<section class="hero-section relative overflow-hidden" data-mobile-layout={mobileLayout} data-dr-section="hero" id="hero">
+
+  <!-- Hidden field so the runtime injector can update mobileLayout -->
+  <span data-dr-field="mobileLayout" style="display:none">{mobileLayout}</span>
+
+  <!-- ═══ Background Media ═══ -->
+  <div class="absolute inset-0 z-0">
+
+    <!-- Image Mode -->
+    <div
+      data-dr-show-when="hero.heroType=image"
+      style={isImage ? '' : 'display:none'}
+      class="w-full h-full"
+    >
+      <img
+        src={imgSrc(data.backgroundImage || 'defaults/default-hero.jpg')}
+        alt={data.backgroundImageAlt}
+        width="1920"
+        height="1080"
+        class="w-full h-full object-cover"
+        loading="eager"
+        fetchpriority="high"
+        data-dr-field="backgroundImage"
+      />
+    </div>
+
+    <!-- Carousel Mode -->
+    <div
+      data-dr-show-when="hero.heroType=carousel"
+      style={isCarousel ? '' : 'display:none'}
+      class="w-full h-full"
+    >
+      <div class="hero-carousel w-full h-full relative" data-dr-list="images">
+        {carouselImages.map((img, index) => (
+          <div
+            data-dr-list-item
+            data-dr-carousel-slide
+            class="absolute inset-0 transition-opacity duration-1000"
+            style={`opacity: ${index === 0 ? 1 : 0};`}
+          >
+            <img
+              src={imgSrc(img.src)}
+              alt={img.alt}
+              width="1920"
+              height="1080"
+              class="w-full h-full object-cover"
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchpriority={index === 0 ? 'high' : 'auto'}
+              data-dr-field="src"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Video Mode -->
+    <div
+      data-dr-show-when="hero.heroType=video"
+      style={isVideo ? '' : 'display:none'}
+      class="relative w-full h-full"
+    >
+      <div
+        id="video-skeleton"
+        class="absolute inset-0 bg-primary animate-pulse flex items-center justify-center"
+      >
+        <div class="w-16 h-16 border-2 border-border border-t-primary-foreground rounded-full animate-spin"></div>
+      </div>
+      <video
+        src={imgSrc(data.heroVideo || 'defaults/demo-video.mp4')}
+        autoplay={data.videoAutoplay !== false}
+        muted={data.videoMuted !== false}
+        loop
+        playsinline
+        class="w-full h-full object-cover opacity-0 transition-opacity duration-500"
+        data-dr-field="heroVideo"
+        onloadeddata="this.style.opacity='1'; document.getElementById('video-skeleton').style.display='none';"
+        oncanplay="this.style.opacity='1'; document.getElementById('video-skeleton').style.display='none';"
+      />
+    </div>
+
+    <!-- Gradient overlays (dual-layer for depth) -->
+    <div
+      class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-black/10 pointer-events-none"
+      style={!overlayEnabled ? 'display:none' : ''}
+      data-dr-show-when="hero.overlayEnabled=true"
+    ></div>
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20 pointer-events-none"
+      style={!overlayEnabled ? 'display:none' : ''}
+      data-dr-show-when="hero.overlayEnabled=true"
+    ></div>
+  </div>
+
+  <!-- ═══ Content ═══ -->
+  <div class="relative z-10 h-full flex items-center hero-content-outer">
+    <div class="hero-content-wrap w-full max-w-7xl mx-auto px-8 md:px-12 lg:px-16 text-center">
+
+      <!-- Headline -->
+      <h1
+        class="font-serif text-[clamp(2.8rem,6.5vw,5.5rem)] leading-[1.05] tracking-[-0.01em] text-primary-foreground font-light mb-6 mx-auto max-w-[15ch]"
+        data-dr-field="headline"
+        data-dr-style="headline"
+      >
+        {data.headline}
+      </h1>
+
+      <!-- Accent line -->
+      <div class="hero-accent-line w-12 h-[1px] bg-primary-foreground/25 mb-8 mx-auto"></div>
+
+      <!-- Subtext -->
+      <p
+        class="text-sm md:text-base tracking-wide text-primary-foreground/55 font-light leading-relaxed max-w-lg mx-auto mb-10"
+        data-dr-field="subtext"
+        data-dr-style="subtext"
+      >
+        {data.subtext}
+      </p>
+
+      <!-- CTA Button -->
+      <button
+        class={`hero-cta inline-flex items-center gap-3 md:gap-4 border border-primary-foreground/30 text-primary-foreground text-[9px] md:text-[10px] tracking-[0.35em] uppercase px-5 py-3 md:px-8 md:py-4 hover:bg-primary-foreground hover:text-primary transition-all duration-300 font-medium group ${!data.ctaText ? 'hidden' : ''}`}
+        data-cta-action="scroll"
+        data-cta-target="contact"
+        id="hero-cta-btn"
+      >
+        <span data-dr-field="ctaText">
+          {data.ctaText || 'Contact Us'}
+        </span>
+        <svg class="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ Bottom Bar: Dots + Counter + Scroll ═══ -->
+
+  <!-- Slide Dots (carousel only) -->
+  <div
+    class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2"
+    id="hero-dots"
+    data-dr-show-when="hero.heroType=carousel"
+    style={!isCarousel || carouselImages.length <= 1 ? 'display: none !important;' : ''}
+  >
+    {carouselImages.map((_, i) => (
+      <button
+        data-dr-carousel-dot
+        class="h-[2px] transition-all duration-400"
+        style={`width: ${i === 0 ? '40px' : '16px'}; background: ${i === 0 ? 'var(--primary-foreground)' : 'rgba(255,255,255,0.3)'};`}
+      ></button>
+    ))}
+  </div>
+
+  <!-- Slide Counter (carousel only) -->
+  <div
+    class="absolute bottom-10 right-8 md:right-12 z-20 font-sans text-[11px] tracking-[0.2em] text-primary-foreground/25 select-none"
+    data-dr-show-when="hero.heroType=carousel"
+    style={!isCarousel || carouselImages.length <= 1 ? 'display: none !important;' : ''}
+  >
+    <span id="hero-current">01</span>&thinsp;/&thinsp;<span id="hero-total">{String(carouselImages.length).padStart(2, '0')}</span>
+  </div>
+
+  <!-- Scroll Indicator -->
+  <div class="absolute bottom-10 left-8 md:left-12 z-20 flex flex-col items-center gap-2 text-primary-foreground/30">
+    <div class="hero-scroll-line w-[1px] h-10 bg-primary-foreground/15 overflow-hidden">
+      <div class="w-full h-1/2 bg-primary-foreground/50 hero-scroll-animate"></div>
+    </div>
+    <span class="text-[9px] tracking-[0.3em] uppercase font-sans">Scroll</span>
+  </div>
+
+</section>
+
+<style>
+  /* Mobile layout options — driven by data-mobile-layout attribute so JS can switch them at runtime */
+  [data-mobile-layout="fullscreen"] { height: 100vh; min-height: 600px; }
+
+  [data-mobile-layout="auto"]       { min-height: 60vh; }
+  @media (min-width: 768px) {
+    [data-mobile-layout="auto"]     { height: 100vh; }
+  }
+
+  /* Preview-mode viewport overrides (data-dr-viewport set by runtime on viewport-change) */
+  html[data-dr-viewport="mobile"] [data-mobile-layout="auto"]      { min-height: 60vh; height: auto; }
+  html[data-dr-viewport="mobile"] [data-mobile-layout="fullscreen"] { height: 100vh; min-height: 600px; }
+
+  html[data-dr-viewport="tablet"] [data-mobile-layout="auto"],
+  html[data-dr-viewport="desktop"] [data-mobile-layout="auto"]      { height: 100vh; }
+
+  /* Content clears navbar — padding-top set dynamically by JS */
+  .hero-content-outer {
+    padding-bottom: 5rem;
+  }
+
+  @keyframes scrollDown {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(200%); }
+  }
+
+  .hero-scroll-animate {
+    animation: scrollDown 1.8s ease-in-out infinite;
+  }
+
+  /* Alignment driven by data-hero-align attribute (synced from headline textAlign) */
+  .hero-content-wrap[data-hero-align="left"]   { text-align: left; }
+  .hero-content-wrap[data-hero-align="center"]  { text-align: center; }
+  .hero-content-wrap[data-hero-align="right"]   { text-align: right; }
+
+  .hero-content-wrap[data-hero-align="left"] .hero-accent-line   { margin-left: 0; margin-right: auto; }
+  .hero-content-wrap[data-hero-align="center"] .hero-accent-line  { margin-left: auto; margin-right: auto; }
+  .hero-content-wrap[data-hero-align="right"] .hero-accent-line   { margin-left: auto; margin-right: 0; }
+
+  .hero-content-wrap[data-hero-align="left"] h1,
+  .hero-content-wrap[data-hero-align="left"] p  { margin-left: 0; margin-right: auto; }
+  .hero-content-wrap[data-hero-align="center"] h1,
+  .hero-content-wrap[data-hero-align="center"] p { margin-left: auto; margin-right: auto; }
+  .hero-content-wrap[data-hero-align="right"] h1,
+  .hero-content-wrap[data-hero-align="right"] p  { margin-left: auto; margin-right: 0; }
+</style>
+
+<script>
+  (function () {
+    var autoTimer: ReturnType<typeof setInterval> | null = null;
+
+    function initCarousel() {
+      var track = document.querySelector('[data-dr-list="images"]');
+      if (!track) return;
+
+      if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+
+      var slides = Array.from(track.querySelectorAll('[data-dr-carousel-slide]'));
+      var counter = document.getElementById('hero-current');
+      var totalEl = document.getElementById('hero-total');
+
+      // ── Sync dot indicators ──
+      var dotsContainer = document.getElementById('hero-dots');
+      if (dotsContainer) {
+        var existingDots = Array.from(dotsContainer.querySelectorAll('[data-dr-carousel-dot]'));
+        while (existingDots.length < slides.length) {
+          var newDot = document.createElement('button');
+          newDot.setAttribute('data-dr-carousel-dot', '');
+          newDot.className = 'h-[2px] transition-all duration-400';
+          newDot.style.width = '16px';
+          newDot.style.background = 'rgba(255,255,255,0.3)';
+          dotsContainer.appendChild(newDot);
+          existingDots.push(newDot);
+        }
+        while (existingDots.length > slides.length) {
+          var removeDot = existingDots.pop();
+          if (removeDot) removeDot.remove();
+        }
+        dotsContainer.style.display = slides.length <= 1 ? 'none !important' : '';
+      }
+      var dots = Array.from(document.querySelectorAll('[data-dr-carousel-dot]'));
+
+      if (totalEl) totalEl.textContent = String(slides.length).padStart(2, '0');
+      if (slides.length <= 1) return;
+
+      var current = 0;
+      var fgColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-foreground').trim();
+
+      // Reset initial state
+      slides.forEach(function (slide, i) {
+        (slide as HTMLElement).style.opacity = i === 0 ? '1' : '0';
+      });
+      dots.forEach(function (dot, i) {
+        (dot as HTMLElement).style.width = i === 0 ? '40px' : '16px';
+        (dot as HTMLElement).style.background = i === 0 ? fgColor : 'rgba(255,255,255,0.3)';
+      });
+      if (counter) counter.textContent = '01';
+
+      function setSlide(index: number) {
+        var prev = current;
+        current = ((index % slides.length) + slides.length) % slides.length;
+
+        (slides[prev] as HTMLElement).style.opacity = '0';
+        (slides[current] as HTMLElement).style.opacity = '1';
+
+        if (dots[prev]) { (dots[prev] as HTMLElement).style.width = '16px'; (dots[prev] as HTMLElement).style.background = 'rgba(255,255,255,0.3)'; }
+        if (dots[current]) { (dots[current] as HTMLElement).style.width = '40px'; (dots[current] as HTMLElement).style.background = fgColor; }
+
+        if (counter) counter.textContent = String(current + 1).padStart(2, '0');
+      }
+
+      function startAuto() { autoTimer = setInterval(function () { setSlide(current + 1); }, 5000); }
+      function resetAuto() { if (autoTimer) clearInterval(autoTimer); startAuto(); }
+
+      // Dot click navigation
+      dots.forEach(function (dot, i) {
+        dot.addEventListener('click', function () { setSlide(i); resetAuto(); });
+      });
+
+      // Touch swipe support
+      var touchStartX = 0;
+      var heroEl = document.querySelector('[data-dr-section="hero"]') as HTMLElement | null;
+      if (heroEl) {
+        heroEl.addEventListener('touchstart', function (e) {
+          var touchEvent = e as TouchEvent;
+          touchStartX = touchEvent.touches[0].clientX;
+        }, { passive: true });
+        heroEl.addEventListener('touchend', function (e) {
+          var touchEvent = e as TouchEvent;
+          var diff = touchStartX - touchEvent.changedTouches[0].clientX;
+          if (Math.abs(diff) > 50) {
+            setSlide(diff > 0 ? current + 1 : current - 1);
+            resetAuto();
+          }
+        }, { passive: true });
+      }
+
+      startAuto();
+    }
+
+    function initCta() {
+      var ctaBtn = document.getElementById('hero-cta-btn');
+      if (!ctaBtn) return;
+
+      ctaBtn.addEventListener('click', function () {
+        var action = ctaBtn!.getAttribute('data-cta-action');
+        var target = ctaBtn!.getAttribute('data-cta-target');
+
+        if (action === 'scroll' && target) {
+          var el = document.getElementById(target) || document.querySelector('[data-dr-section="' + target + '"]');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (action === 'modal') {
+          var modal = document.getElementById('contact-modal');
+          if (modal) modal.style.display = 'flex';
+        } else if (action === 'link' && target) {
+          window.open(target, '_blank', 'noopener,noreferrer');
+        } else if (action === 'phone' && target) {
+          var num = target.replace(/\s+/g, '');
+          window.location.href = 'tel:' + (num.startsWith('+') || num.startsWith('0') ? num : '+' + num);
+        } else if (action === 'download' && target) {
+          var a = document.createElement('a');
+          a.href = target;
+          a.download = '';
+          a.click();
+        }
+      });
+    }
+
+    // Re-init when runtime updates carousel images
+    document.addEventListener('dr:content-updated', function (e) {
+      var contentEvent = e as CustomEvent<{ sectionId?: string }>;
+      if (contentEvent.detail && contentEvent.detail.sectionId === 'hero') {
+        requestAnimationFrame(initCarousel);
+      }
+    });
+
+    function observeCarouselVisibility() {
+      var carouselWrapper = document.querySelector('[data-dr-show-when="hero.heroType=carousel"]');
+      if (!carouselWrapper) return;
+
+      var observer = new MutationObserver(function () {
+        if ((carouselWrapper as HTMLElement).style.display !== 'none') {
+          requestAnimationFrame(initCarousel);
+        }
+      });
+      observer.observe(carouselWrapper, { attributes: true, attributeFilter: ['style'] });
+    }
+
+    function initMobileLayoutObserver() {
+      var layoutField = document.querySelector('[data-dr-section="hero"] [data-dr-field="mobileLayout"]');
+      var sectionEl = document.querySelector('[data-dr-section="hero"]') as HTMLElement | null;
+      if (!layoutField || !sectionEl) return;
+      var layoutFieldEl = layoutField as HTMLElement;
+      var sectionElement = sectionEl;
+
+      var VALID_LAYOUTS = ['fullscreen', 'auto'];
+      var observer = new MutationObserver(function () {
+        var val = (layoutFieldEl.textContent || '').trim();
+        if (VALID_LAYOUTS.includes(val)) {
+          sectionElement.setAttribute('data-mobile-layout', val);
+        }
+      });
+      observer.observe(layoutFieldEl, { childList: true, characterData: true, subtree: true });
+    }
+
+    // Sync headline textAlign to parent wrapper via data-hero-align attribute
+    function initAlignmentObserver() {
+      var headline = document.querySelector('[data-dr-section="hero"] [data-dr-style="headline"]') as HTMLElement | null;
+      var wrap = document.querySelector('.hero-content-wrap') as HTMLElement | null;
+      if (!headline || !wrap) return;
+
+      // Set initial alignment
+      wrap.setAttribute('data-hero-align', 'center');
+      var headlineEl = headline;
+      var wrapEl = wrap;
+
+      var observer = new MutationObserver(function () {
+        var align = headlineEl.style.textAlign || 'center';
+        wrapEl.setAttribute('data-hero-align', align);
+      });
+      observer.observe(headlineEl, { attributes: true, attributeFilter: ['style'] });
+    }
+
+    // Dynamically measure navbar and apply padding-top to hero content
+    function syncNavbarSpacing() {
+      var nav = document.querySelector('.nav-bar') as HTMLElement | null;
+      var content = document.querySelector('[data-dr-section="hero"] .hero-content-outer') as HTMLElement | null;
+      if (!nav || !content) return;
+      var navH = nav.offsetHeight;
+      content.style.paddingTop = (navH + 16) + 'px';
+    }
+
+    function initNavbarObserver() {
+      syncNavbarSpacing();
+      window.addEventListener('resize', syncNavbarSpacing);
+      var nav = document.querySelector('.nav-bar');
+      if (nav) {
+        var obs = new MutationObserver(syncNavbarSpacing);
+        obs.observe(nav, { attributes: true, attributeFilter: ['class'] });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        initCarousel();
+        initCta();
+        observeCarouselVisibility();
+        initMobileLayoutObserver();
+        initAlignmentObserver();
+        initNavbarObserver();
+      });
+    } else {
+      initCarousel();
+      initCta();
+      observeCarouselVisibility();
+      initMobileLayoutObserver();
+      initAlignmentObserver();
+      initNavbarObserver();
+    }
+  })();
+</script>

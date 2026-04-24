@@ -1,0 +1,13 @@
+{
+    "id": "minimal-luxury",
+    "name": "Minimal Luxury",
+    "description": "A refined, minimal template with award-winning aesthetics.",
+    "category": "luxury",
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "previewUrl": "http://localhost:4321",
+    "previewImage": "/hero.png",
+    "version": "1.0.0",
+    "sectionCount": 9,
+    "previewRuntimeVersion": "1.0.0"
+}
