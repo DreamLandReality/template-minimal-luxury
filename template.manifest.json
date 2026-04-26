@@ -172,6 +172,7 @@
           },
           "videoAutoplay": {
             "type": "boolean",
+            "default": false,
             "uiLabel": "Autoplay Video",
             "uiShowWhen": {
               "sibling": "heroType",
@@ -180,6 +181,7 @@
           },
           "videoMuted": {
             "type": "boolean",
+            "default": true,
             "uiLabel": "Mute Video",
             "uiShowWhen": {
               "sibling": "heroType",
@@ -188,6 +190,7 @@
           },
           "heroType": {
             "type": "string",
+            "default": "image",
             "uiLabel": "Media Type",
             "uiWidget": "select",
             "uiOrder": 10,
@@ -238,6 +241,7 @@
           },
           "mobileLayout": {
             "type": "string",
+            "default": "fullscreen",
             "uiLabel": "Mobile Layout",
             "uiWidget": "select",
             "uiSection": "layout",
@@ -254,6 +258,7 @@
           },
           "overlayEnabled": {
             "type": "boolean",
+            "default": true,
             "uiLabel": "Enable Overlay",
             "description": "Dark overlay on hero background for text readability",
             "uiSection": "layout"
@@ -484,6 +489,7 @@
           },
           "mediaType": {
             "type": "string",
+            "default": "image",
             "uiLabel": "Media Type",
             "uiWidget": "select",
             "options": [
@@ -511,6 +517,7 @@
           },
           "videoAutoplay": {
             "type": "boolean",
+            "default": false,
             "uiLabel": "Autoplay Video",
             "uiShowWhen": {
               "sibling": "mediaType",
@@ -519,6 +526,7 @@
           },
           "videoMuted": {
             "type": "boolean",
+            "default": true,
             "uiLabel": "Mute Video",
             "uiShowWhen": {
               "sibling": "mediaType",
@@ -558,6 +566,7 @@
         "properties": {
           "previewState": {
             "type": "string",
+            "default": "locked",
             "uiLabel": "Preview State (Editor Only)",
             "uiWidget": "select",
             "options": [
@@ -830,6 +839,7 @@
           },
           "enablePhone": {
             "type": "boolean",
+            "default": false,
             "uiLabel": "Enable Phone"
           },
           "phone": {
@@ -842,6 +852,7 @@
           },
           "enableWhatsApp": {
             "type": "boolean",
+            "default": false,
             "uiLabel": "Enable WhatsApp"
           },
           "whatsapp": {
@@ -860,6 +871,7 @@
           },
           "enableEmail": {
             "type": "boolean",
+            "default": false,
             "uiLabel": "Enable Email"
           },
           "email": {
@@ -878,6 +890,7 @@
           },
           "enableMap": {
             "type": "boolean",
+            "default": false,
             "uiLabel": "Enable Map"
           },
           "mapEmbedUrl": {
