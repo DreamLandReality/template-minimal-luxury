@@ -8,9 +8,6 @@ export interface Props {
     priceLabel: string;
     priceNote?: string;
     unlockButtonText?: string;
-    showBrochureDownload?: boolean;
-    brochureFile?: string;
-    brochureButtonText?: string;
     modalHeading?: string;
     modalSubtext?: string;
     modalSubmitText?: string;
@@ -22,14 +19,13 @@ export interface Props {
 }
 
 const { data } = Astro.props;
-const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
 ---
 
 <section class="py-24 bg-surface border-t border-border" data-dr-section="price-unlock">
-  <div class="max-w-7xl mx-auto px-8 md:px-12">
+  <div class="max-w-4xl mx-auto px-8 md:px-12">
     <!-- Section header -->
     {(data.sectionEyebrow || data.sectionTitle) && (
-      <div class="mb-14">
+      <div class="mb-14 text-center">
         {data.sectionEyebrow && (
           <p class="text-[10px] uppercase tracking-[0.4em] text-muted mb-3" data-dr-field="sectionEyebrow">
             {data.sectionEyebrow}
@@ -43,107 +39,61 @@ const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
       </div>
     )}
 
-    <!-- Two-column layout: price + brochure -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
+    <!-- Single-column price card -->
+    <div class="bg-surface border border-border p-10 md:p-16 flex flex-col items-center justify-center">
+      <p class="text-[10px] uppercase tracking-[0.4em] text-muted mb-5" data-dr-field="priceLabel">
+        {data.priceLabel}
+      </p>
 
-      <!-- Price Card -->
-      <div class="bg-surface p-10 md:p-14 flex flex-col justify-center">
-        <p class="text-[10px] uppercase tracking-[0.4em] text-muted mb-5" data-dr-field="priceLabel">
-          {data.priceLabel}
-        </p>
-
-        <div class="relative mb-6">
-          <p
-            id="price-display"
-            class="text-5xl md:text-6xl font-serif font-light text-primary transition-all duration-700 leading-none"
-            style="filter: blur(14px); user-select: none; pointer-events: none;"
-            data-dr-field="price"
-            data-dr-effect-when="price-unlock.previewState=locked|price-unlock.previewState=modal"
-            data-dr-effect="filter:blur(14px);user-select:none;pointer-events:none"
-          >
-            {data.price}
-          </p>
-          {data.priceNote && (
-            <p
-              id="price-note"
-              class="text-sm text-muted mt-3 transition-all duration-700"
-              style="filter: blur(8px);"
-              data-dr-field="priceNote"
-              data-dr-effect-when="price-unlock.previewState=locked|price-unlock.previewState=modal"
-              data-dr-effect="filter:blur(8px)"
-            >
-              {data.priceNote}
-            </p>
-          )}
-        </div>
-
-        <!-- Unlock Button -->
-        <div id="unlock-btn-wrapper" style="" data-dr-hide-when="price-unlock.previewState=unlocked|price-unlock.previewState=modal">
-          <button
-            id="price-unlock-btn"
-            class="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-primary border-b border-primary pb-1 hover:text-muted hover:border-muted transition-colors duration-300"
-            data-dr-field="unlockButtonText"
-          >
-            {data.unlockButtonText || 'Unlock Price'}
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- Success message -->
+      <div class="relative mb-6">
         <p
-          id="price-success-msg"
-          class="text-[11px] uppercase tracking-[0.2em] text-muted mt-2"
-          style="display: none;"
-          data-dr-field="modalSuccessMessage"
-          data-dr-show-when="price-unlock.previewState=unlocked"
+          id="price-display"
+          class="text-5xl md:text-6xl font-serif font-light text-primary transition-all duration-700 leading-none"
+          style="filter: blur(14px); user-select: none; pointer-events: none;"
+          data-dr-field="price"
+          data-dr-effect-when="price-unlock.previewState=locked|price-unlock.previewState=modal"
+          data-dr-effect="filter:blur(14px);user-select:none;pointer-events:none"
         >
-          {data.modalSuccessMessage || 'Price unlocked successfully'}
+          {data.price}
         </p>
+        {data.priceNote && (
+          <p
+            id="price-note"
+            class="text-sm text-muted mt-3 transition-all duration-700 text-center"
+            style="filter: blur(8px);"
+            data-dr-field="priceNote"
+            data-dr-effect-when="price-unlock.previewState=locked|price-unlock.previewState=modal"
+            data-dr-effect="filter:blur(8px)"
+          >
+            {data.priceNote}
+          </p>
+        )}
       </div>
 
-      <!-- Brochure Card -->
-      {data.showBrochureDownload && (
-        <div class="bg-primary p-10 md:p-14 flex flex-col justify-center">
-          <p class="text-[10px] uppercase tracking-[0.4em] text-primary-foreground/50 mb-5">
-            Project Brochure
-          </p>
-          <p class="text-2xl md:text-3xl font-serif font-light text-primary-foreground mb-8 leading-snug">
-            Discover the full<br />details within
-          </p>
-          <a
-            href={data.brochureFile}
-            download
-            class="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-primary-foreground border-b border-primary-foreground/40 pb-1 hover:border-primary-foreground transition-colors duration-300 w-fit"
-          >
-            <span data-dr-field="brochureButtonText">{data.brochureButtonText || 'Download Brochure'}</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-          </a>
-        </div>
-      )}
+      <!-- Unlock Button -->
+      <div id="unlock-btn-wrapper" style="" data-dr-hide-when="price-unlock.previewState=unlocked|price-unlock.previewState=modal">
+        <button
+          id="price-unlock-btn"
+          class="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-primary border-b border-primary pb-1 hover:text-muted hover:border-muted transition-colors duration-300"
+          data-dr-field="unlockButtonText"
+        >
+          {data.unlockButtonText || 'Unlock Price'}
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </button>
+      </div>
 
-      {!data.showBrochureDownload && (
-        <div class="bg-background p-10 md:p-14 flex flex-col justify-center border-l border-border">
-          <p class="text-[10px] uppercase tracking-[0.4em] text-muted mb-6">
-            Schedule a Viewing
-          </p>
-          <p class="text-xl md:text-2xl font-serif font-light text-primary mb-8 leading-snug">
-            Experience the property<br />in person
-          </p>
-          <a
-            href="#contact"
-            class="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-primary border-b border-primary pb-1 hover:text-muted hover:border-muted transition-colors duration-300 w-fit"
-          >
-            Book a visit
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
-        </div>
-      )}
+      <!-- Success message -->
+      <p
+        id="price-success-msg"
+        class="text-[11px] uppercase tracking-[0.2em] text-muted mt-2"
+        style="display: none;"
+        data-dr-field="modalSuccessMessage"
+        data-dr-show-when="price-unlock.previewState=unlocked"
+      >
+        {data.modalSuccessMessage || 'Price unlocked successfully'}
+      </p>
     </div>
   </div>
 
@@ -234,26 +184,21 @@ const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
 <script>
 (function () {
   var isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
+  if (isPreview) return; // Preview mode uses postMessage, not gate runtime
 
-  var unlockBtn = document.getElementById('price-unlock-btn');
-  var modal = document.getElementById('contact-modal');
-  var modalClose = document.getElementById('modal-close');
   var form = document.getElementById('unlock-form');
-  var priceDisplay = document.getElementById('price-display');
-  var priceNote = document.getElementById('price-note');
-  var unlockBtnWrapper = document.getElementById('unlock-btn-wrapper');
-  var successMsg = document.getElementById('price-success-msg');
 
-  function openModal() {
-    if (isPreview) return;
-    if (modal) {
-      modal.style.display = 'flex';
-      modal.style.alignItems = 'center';
-      modal.style.justifyContent = 'center';
-      document.body.style.overflow = 'hidden';
+  // Use gate runtime API
+  var unlockBtn = document.getElementById('price-unlock-btn');
+  unlockBtn && unlockBtn.addEventListener('click', function() {
+    if (window.dlrGate) {
+      window.dlrGate.open();
     }
-  }
+  });
 
+  var modalClose = document.getElementById('modal-close');
+  var modal = document.getElementById('contact-modal');
+  
   function closeModal() {
     if (modal) {
       modal.style.display = 'none';
@@ -261,19 +206,6 @@ const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
     }
   }
 
-  function revealPrice() {
-    if (priceDisplay) {
-      priceDisplay.style.filter = '';
-      priceDisplay.style.pointerEvents = '';
-      priceDisplay.style.userSelect = '';
-    }
-    if (priceNote) priceNote.style.filter = '';
-    if (unlockBtnWrapper) unlockBtnWrapper.style.display = 'none';
-    if (successMsg) successMsg.style.display = '';
-    closeModal();
-  }
-
-  unlockBtn && unlockBtn.addEventListener('click', openModal);
   modalClose && modalClose.addEventListener('click', closeModal);
 
   modal && modal.addEventListener('click', function (e) {
@@ -302,8 +234,10 @@ const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
       return;
     }
 
-    // Reveal price immediately — don't block on network
-    revealPrice();
+    // Unlock via gate runtime
+    if (window.dlrGate) {
+      window.dlrGate.unlock();
+    }
 
     // Fire-and-forget submission to edge function
     var endpoint = formEl.dataset.endpoint;

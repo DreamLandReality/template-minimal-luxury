@@ -6,6 +6,12 @@
         "bucket": "template-assets",
         "prefix": "templates/minimal-luxury"
     },
+    "gate": {
+        "sectionId": "price-unlock",
+        "siteToken": null,
+        "submissionEndpoint": null,
+        "supabaseAnonKey": null
+    },
     "collections": [],
     "pages": [
         {
@@ -570,24 +576,6 @@
                         "type": "string",
                         "uiLabel": "Unlock Button Text"
                     },
-                    "showBrochureDownload": {
-                        "type": "boolean",
-                        "uiLabel": "Show Brochure Download"
-                    },
-                    "brochureFile": {
-                        "type": "string",
-                        "uiLabel": "Brochure PDF",
-                        "uiWidget": "fileUpload",
-                        "uiAccept": "application/pdf",
-                        "uiShowWhen": {
-                            "sibling": "showBrochureDownload",
-                            "value": true
-                        }
-                    },
-                    "brochureButtonText": {
-                        "type": "string",
-                        "uiLabel": "Brochure Button Text"
-                    },
                     "modalHeading": {
                         "type": "string",
                         "uiLabel": "Modal Heading"
@@ -613,6 +601,11 @@
                         "type": "string",
                         "description": "System Injected \u2014 deployment auth token",
                         "aiIgnore": true
+                    },
+                    "supabaseAnonKey": {
+                        "type": "string",
+                        "description": "System Injected \u2014 Supabase anon key",
+                        "aiIgnore": true
                     }
                 }
             },
@@ -626,13 +619,10 @@
                 "priceLabel": "Base Price",
                 "priceNote": "Plus applicable taxes",
                 "unlockButtonText": "Unlock Price",
-                "showBrochureDownload": true,
-                "brochureFile": null,
-                "brochureButtonText": "Download Brochure",
-                "modalHeading": "Get Your Brochure",
-                "modalSubtext": "Please provide your details to unlock the full pricing information and receive our exclusive property brochure.",
-                "modalSubmitText": "Send Brochure",
-                "modalSuccessMessage": "Thank you! Check your email for the brochure.",
+                "modalHeading": "Unlock Pricing",
+                "modalSubtext": "Please provide your details to unlock the full pricing information.",
+                "modalSubmitText": "Unlock Now",
+                "modalSuccessMessage": "Price unlocked successfully",
                 "submissionEndpoint": null,
                 "siteToken": null,
                 "supabaseAnonKey": null
