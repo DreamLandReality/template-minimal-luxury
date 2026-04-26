@@ -76,12 +76,12 @@ const { title, seo, transparentNav = false, gateConfig = null } = Astro.props;
       import '../lib/manifest-injector';
     </script>
 
-    {gateConfig && gateConfig.siteToken && (
+    {gateConfig && (
       <script is:inline define:vars={{ 
         sectionId: gateConfig.sectionId,
-        token: gateConfig.siteToken,
-        endpoint: gateConfig.submissionEndpoint,
-        anonKey: gateConfig.supabaseAnonKey
+        token: gateConfig.siteToken || 'demo',
+        endpoint: gateConfig.submissionEndpoint || null,
+        anonKey: gateConfig.supabaseAnonKey || null
       }}>
         window.__DLR = { sectionId, token, endpoint, anonKey };
       </script>
