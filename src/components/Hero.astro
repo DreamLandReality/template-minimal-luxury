@@ -168,7 +168,7 @@ const overlayEnabled = data.overlayEnabled !== false;
     class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2"
     id="hero-dots"
     data-dr-show-when="hero.heroType=carousel"
-    style={!isCarousel || carouselImages.length <= 1 ? 'display: none !important;' : ''}
+    style={carouselImages.length <= 1 ? 'display: none !important;' : ''}
   >
     {carouselImages.map((_, i) => (
       <button
@@ -183,7 +183,7 @@ const overlayEnabled = data.overlayEnabled !== false;
   <div
     class="absolute bottom-10 right-8 md:right-12 z-20 font-sans text-[11px] tracking-[0.2em] text-primary-foreground/25 select-none"
     data-dr-show-when="hero.heroType=carousel"
-    style={!isCarousel || carouselImages.length <= 1 ? 'display: none !important;' : ''}
+    style={carouselImages.length <= 1 ? 'display: none !important;' : ''}
   >
     <span id="hero-current">01</span>&thinsp;/&thinsp;<span id="hero-total">{String(carouselImages.length).padStart(2, '0')}</span>
   </div>
