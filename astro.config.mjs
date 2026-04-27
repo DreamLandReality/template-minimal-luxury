@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://template-minimal-luxury.pages.dev', // Replaced at deploy time
+  site: process.env.SITE_URL || 'http://localhost:4321',
   integrations: [
     tailwind(),
     sitemap()

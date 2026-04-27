@@ -326,7 +326,8 @@ const {
     getAllSections, 
     getManifest,
     getGateConfig,
-    getStateTypes
+    getStateTypes,
+    getAllSectionData
 } = createManifestLoader({
     manifest,
     defaultTheme: {
@@ -357,5 +358,6 @@ export {
     getAllSections,
     getManifest,
     getGateConfig,
-    getStateTypes
+    getStateTypes,
+    getAllSectionData
 };

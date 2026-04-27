@@ -573,8 +573,7 @@
         "videoAutoplay": false,
         "videoMuted": true,
         "mediaAlt": "Luxury property showcase",
-        "caption": "Explore our properties in stunning detail",
-        "videoFile": "https://pub-da5fe52c12854625bef20ed173f635f1.r2.dev/shared-defaults/demo-video.mp4"
+        "caption": "Explore our properties in stunning detail"
       }
     },
     {
@@ -592,7 +591,7 @@
           "priceLabel"
         ],
         "properties": {
-          "previewState": {
+          "state": {
             "type": "string",
             "uiLabel": "Preview State (Editor Only)",
             "uiWidget": "select",
@@ -672,7 +671,7 @@
       "dataType": "object",
       "enabled": true,
       "data": {
-        "previewState": "locked",
+        "state": "locked",
         "sectionEyebrow": "Pricing",
         "sectionTitle": "Investment Details",
         "price": "Starting from $4.8M",
@@ -1048,6 +1047,12 @@
           "siteToken": {
             "type": "string",
             "description": "System Injected — deployment auth token",
+            "aiIgnore": true,
+            "editable": false
+          },
+          "supabaseAnonKey": {
+            "type": "string",
+            "description": "System Injected — Supabase anon key",
             "aiIgnore": true,
             "editable": false
           }
