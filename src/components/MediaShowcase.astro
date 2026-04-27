@@ -14,10 +14,6 @@ export interface Props {
 
 const { data } = Astro.props;
 const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
-
-const isImage = data.mediaType === 'image';
-const isVideo = data.mediaType === 'video';
-const is3D = data.mediaType === '3d-image' || data.mediaType === '3d-video';
 ---
 
 <section class="py-24 px-8 md:px-12" data-dr-section="media-showcase">
@@ -42,7 +38,6 @@ const is3D = data.mediaType === '3d-image' || data.mediaType === '3d-video';
       <!-- ═══ Image Mode ═══ -->
       <div
         data-dr-show-when="media-showcase.mediaType=image"
-        style={isImage ? '' : 'display:none'}
         class="w-full h-full"
       >
         <img
@@ -56,7 +51,6 @@ const is3D = data.mediaType === '3d-image' || data.mediaType === '3d-video';
       <!-- ═══ Video Mode ═══ -->
       <div
         data-dr-show-when="media-showcase.mediaType=video"
-        style={isVideo ? '' : 'display:none'}
         class="relative w-full h-full"
       >
         <!-- Video Loading Skeleton -->
@@ -85,7 +79,6 @@ const is3D = data.mediaType === '3d-image' || data.mediaType === '3d-video';
       <!-- ═══ 3D Mode (3d-image and 3d-video) ═══ -->
       <div
         data-dr-show-when="media-showcase.mediaType=3d-image|media-showcase.mediaType=3d-video"
-        style={is3D ? '' : 'display:none'}
         class="w-full h-full"
       >
         <model-viewer

@@ -12,6 +12,42 @@
     "submissionEndpoint": null,
     "supabaseAnonKey": null
   },
+  "stateTypes": {
+    "hero.heroMediaType": {
+      "type": "enum",
+      "values": [
+        "image",
+        "carousel",
+        "video"
+      ],
+      "default": "image",
+      "persist": false,
+      "description": "Hero section media display mode"
+    },
+    "media-showcase.mediaType": {
+      "type": "enum",
+      "values": [
+        "image",
+        "video",
+        "3d-image",
+        "3d-video"
+      ],
+      "default": "image",
+      "persist": false,
+      "description": "Media showcase content type"
+    },
+    "price-unlock.state": {
+      "type": "enum",
+      "values": [
+        "locked",
+        "modal",
+        "unlocked"
+      ],
+      "default": "locked",
+      "persist": true,
+      "description": "Price unlock gate state"
+    }
+  },
   "collections": [],
   "pages": [
     {
