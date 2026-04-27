@@ -63,6 +63,9 @@ const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
           href={data.brochureFile || '#'}
           download={!!data.brochureFile}
           class="group inline-flex items-center gap-4 text-[11px] font-medium tracking-[0.2em] uppercase text-primary border-b border-primary pb-2 hover:text-accent hover:border-accent transition-colors duration-300"
+          data-gate-trigger="lead-capture"
+          data-gate-action="brochure"
+          data-gate-mode="download"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

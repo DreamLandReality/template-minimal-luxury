@@ -49,10 +49,19 @@ export interface ThemeConfig {
 }
 
 export interface GateConfig {
-    sectionId: string;
+    id: string;
+    statePath: string;
+    storageKey: string;
+    defaultState: 'locked' | 'modal' | 'unlocked';
+    persist: boolean;
+    formSectionId?: string;
     siteToken: string | null;
     submissionEndpoint: string | null;
     supabaseAnonKey: string | null;
+    actions: Array<{
+        id: string;
+        mode: 'reveal' | 'download' | 'custom';
+    }>;
 }
 
 export interface ManifestLoaderConfig {
@@ -259,21 +268,24 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
     }
 
     /**
-     * Get gate configuration (credentials for form submission unlock feature).
-     * Returns null if gate block doesn't exist in manifest.
-     * Gate credentials are injected by the deployment pipeline at deploy time.
+     * Get reusable gate configurations for shared gate runtime.
+     * gates[] is the canonical contract for all gated template actions.
      */
-    function getGateConfig(): GateConfig | null {
-        const gate = (manifest as any).gate;
-        if (!gate || typeof gate !== 'object') {
-            return null;
-        }
-        return {
-            sectionId: gate.sectionId ?? 'price-unlock',
+    function getGateConfigs(): GateConfig[] {
+        const gates = (manifest as any).gates;
+        if (!Array.isArray(gates)) return [];
+        return gates.map((gate: any) => ({
+            id: gate.id ?? 'lead-capture',
+            statePath: gate.statePath ?? `${gate.id ?? 'lead-capture'}.state`,
+            storageKey: gate.storageKey ?? `dlr_gate_${(manifest as any).templateId ?? 'template'}_${gate.id ?? 'lead-capture'}_${(gate.statePath ?? `${gate.id ?? 'lead-capture'}.state`).replace(/\./g, '_')}`,
+            defaultState: gate.defaultState ?? 'locked',
+            persist: gate.persist !== false,
+            formSectionId: gate.formSectionId,
             siteToken: gate.siteToken ?? null,
             submissionEndpoint: gate.submissionEndpoint ?? null,
-            supabaseAnonKey: gate.supabaseAnonKey ?? null
-        };
+            supabaseAnonKey: gate.supabaseAnonKey ?? null,
+            actions: gate.actions ?? []
+        }));
     }
 
     /**
@@ -309,7 +321,7 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
         getStyleOverridesCSS,
         getAllSections,
         getManifest,
-        getGateConfig,
+        getGateConfigs,
         getStateTypes,
         getAllSectionData
     };
@@ -325,7 +337,7 @@ const {
     getStyleOverridesCSS, 
     getAllSections, 
     getManifest,
-    getGateConfig,
+    getGateConfigs,
     getStateTypes,
     getAllSectionData
 } = createManifestLoader({
@@ -357,7 +369,7 @@ export {
     getStyleOverridesCSS,
     getAllSections,
     getManifest,
-    getGateConfig,
+    getGateConfigs,
     getStateTypes,
     getAllSectionData
 };

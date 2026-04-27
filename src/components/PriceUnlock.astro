@@ -76,6 +76,9 @@ const { data } = Astro.props;
           id="price-unlock-btn"
           class="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-primary border-b border-primary pb-1 hover:text-muted hover:border-muted transition-colors duration-300"
           data-dr-field="unlockButtonText"
+          data-gate-trigger="lead-capture"
+          data-gate-action="price"
+          data-gate-mode="reveal"
         >
           {data.unlockButtonText || 'Unlock Price'}
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,7 +103,7 @@ const { data } = Astro.props;
   <!-- Modal (Unlock Price Gate) -->
   <div
     id="contact-modal"
-    class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-50"
+    class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
     style="display: none;"
     data-dr-show-when="price-unlock.state=modal"
     role="dialog"
@@ -112,6 +115,7 @@ const { data } = Astro.props;
         id="modal-close"
         class="absolute top-5 right-5 text-muted hover:text-primary transition-colors duration-200"
         aria-label="Close"
+        data-gate-close="lead-capture"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
@@ -134,6 +138,8 @@ const { data } = Astro.props;
         id="unlock-form"
         class="space-y-5"
         novalidate
+        data-gate-form="lead-capture"
+        data-gate-form-type="price-unlock"
         data-endpoint={data.submissionEndpoint || undefined}
         data-token={data.siteToken || undefined}
         data-apikey={data.supabaseAnonKey || undefined}
@@ -180,85 +186,3 @@ const { data } = Astro.props;
     </div>
   </div>
 </section>
-
-<script>
-(function () {
-  var isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
-  if (isPreview) return; // Preview mode uses postMessage, not gate runtime
-
-  var form = document.getElementById('unlock-form');
-
-  // Use gate runtime API
-  var unlockBtn = document.getElementById('price-unlock-btn');
-  unlockBtn && unlockBtn.addEventListener('click', function() {
-    if (window.dlrGate) {
-      window.dlrGate.open();
-    }
-  });
-
-  var modalClose = document.getElementById('modal-close');
-  var modal = document.getElementById('contact-modal');
-  
-  function closeModal() {
-    if (modal) {
-      modal.style.display = 'none';
-      document.body.style.overflow = '';
-    }
-  }
-
-  modalClose && modalClose.addEventListener('click', closeModal);
-
-  modal && modal.addEventListener('click', function (e) {
-    if (e.target === modal) closeModal();
-  });
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && modal && modal.style.display === 'flex') closeModal();
-  });
-
-  form && form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var formEl = e.currentTarget as HTMLFormElement;
-    var nameEl = formEl.querySelector('[name="name"]') as HTMLInputElement | null;
-    var emailEl = formEl.querySelector('[name="email"]') as HTMLInputElement | null;
-    var phoneEl = formEl.querySelector('[name="phone"]') as HTMLInputElement | null;
-    var name = nameEl ? nameEl.value.trim() : '';
-    var email = emailEl ? emailEl.value.trim() : '';
-
-    if (!name) {
-      if (nameEl) nameEl.style.borderColor = '#ef4444';
-      return;
-    }
-    if (!email || !email.includes('@')) {
-      if (emailEl) emailEl.style.borderColor = '#ef4444';
-      return;
-    }
-
-    // Unlock via gate runtime
-    if (window.dlrGate) {
-      window.dlrGate.unlock();
-    }
-
-    // Fire-and-forget submission to edge function
-    var endpoint = formEl.dataset.endpoint;
-    var token = formEl.dataset.token;
-    var apikey = formEl.dataset.apikey;
-    if (endpoint && token) {
-      var hdrs: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (apikey) hdrs['apikey'] = apikey;
-      fetch(endpoint, {
-        method: 'POST',
-        headers: hdrs,
-        body: JSON.stringify({
-          siteToken: token,
-          name: name,
-          email: email,
-          phone: phoneEl ? phoneEl.value.trim() : '',
-          source_url: window.location.href,
-          form_type: 'price-unlock',
-        }),
-      }).catch(function () { /* non-fatal */ });
-    }
-  });
-})();
-</script>

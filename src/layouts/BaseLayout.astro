@@ -22,15 +22,10 @@ export interface Props {
   title: string;
   seo: any;
   transparentNav?: boolean;
-  gateConfig?: {
-    sectionId: string;
-    siteToken: string | null;
-    submissionEndpoint: string | null;
-    supabaseAnonKey: string | null;
-  } | null;
+  gateConfigs?: any[];
 }
 
-const { title, seo, transparentNav = false, gateConfig = null } = Astro.props;
+const { title, seo, transparentNav = false, gateConfigs = [] } = Astro.props;
 const stateTypes = getStateTypes();
 const sectionData = getAllSectionData();
 ---
@@ -82,16 +77,13 @@ const sectionData = getAllSectionData();
       import '../lib/manifest-injector';
     </script>
 
-    {gateConfig && gateConfig.siteToken && (
+    {gateConfigs.length > 0 && (
       <script is:inline define:vars={{
-        sectionId: gateConfig.sectionId,
-        token: gateConfig.siteToken,
-        endpoint: gateConfig.submissionEndpoint,
-        anonKey: gateConfig.supabaseAnonKey,
+        gates: gateConfigs,
         stateTypes: stateTypes,
         sectionData: sectionData
       }}>
-        window.__DLR = { ...(window.__DLR || {}), sectionId, token, endpoint, anonKey, stateTypes, sectionData };
+        window.__DLR = { ...(window.__DLR || {}), gates, stateTypes, sectionData };
       </script>
       <script is:inline src="/gate-runtime.min.js"></script>
     )}

@@ -3,16 +3,15 @@
 
 interface Window {
   __DLR?: {
+    gates?: Array<Record<string, unknown>>;
     stateTypes?: Record<string, unknown>;
     sectionData?: Record<string, unknown>;
-    sectionId?: string;
-    token?: string | null;
-    endpoint?: string | null;
-    anonKey?: string | null;
   };
   dlrGate?: {
-    open: () => void;
-    unlock: () => void;
-    isUnlocked: () => boolean;
+    open: (actionId?: string, gateId?: string) => void;
+    close: (gateId?: string) => void;
+    unlock: (gateId?: string) => void;
+    isUnlocked: (gateId?: string) => boolean;
+    performAction: (actionId: string, gateId?: string) => void;
   };
 }

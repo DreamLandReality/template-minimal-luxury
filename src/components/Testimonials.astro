@@ -33,7 +33,7 @@ const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
       </div>
     )}
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-border" data-dr-list="testimonials">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-border" data-dr-list="items">
       {data.items.map((item, index) => (
         <div class="bg-surface p-10 md:p-12" data-dr-list-item data-dr-index={index}>
           <!-- Stars -->

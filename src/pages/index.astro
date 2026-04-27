@@ -8,7 +8,7 @@ import Testimonials from '../components/Testimonials.astro';
 import Brochure from '../components/Brochure.astro';
 import ContactInfo from '../components/ContactInfo.astro';
 import ContactForm from '../components/ContactForm.astro';
-import { getSectionData, isSectionEnabled, getGateConfig } from '../lib/manifest-loader';
+import { getSectionData, isSectionEnabled, getGateConfigs } from '../lib/manifest-loader';
 
 type SeoData = {
   title?: string;
@@ -16,7 +16,7 @@ type SeoData = {
 };
 
 type HeroData = {
-  heroType?: 'image' | 'carousel' | 'video';
+  heroMediaType?: 'image' | 'carousel' | 'video';
   headline: string;
   subtext: string;
   backgroundImage?: string;
@@ -126,10 +126,10 @@ const testimonialsData = getSectionData<TestimonialsData>('testimonials');
 const brochureData = getSectionData<BrochureData>('brochure');
 const contactInfoData = getSectionData<ContactInfoData>('contact-info');
 const contactFormData = getSectionData<ContactFormData>('contact-form');
-const gateConfig = getGateConfig();
+const gateConfigs = getGateConfigs();
 ---
 
-<BaseLayout title={seoData.title || 'Luxury Residences'} seo={seoData} transparentNav={true} gateConfig={gateConfig}>
+<BaseLayout title={seoData.title || 'Luxury Residences'} seo={seoData} transparentNav={true} gateConfigs={gateConfigs}>
   {isSectionEnabled('hero') && <Hero data={heroData} />}
   {isSectionEnabled('media-showcase') && <MediaShowcase data={mediaShowcaseData} />}
   {isSectionEnabled('price-unlock') && <PriceUnlock data={unlockPriceData} />}
