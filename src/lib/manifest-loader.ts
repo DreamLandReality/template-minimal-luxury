@@ -289,6 +289,18 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
         return stateTypes;
     }
 
+    function getAllSectionData(): Record<string, Record<string, any>> {
+        const result: Record<string, Record<string, any>> = {};
+        const sections = (manifest as any).sections as ManifestSection[];
+        if (!Array.isArray(sections)) return result;
+        for (const section of sections) {
+            if (section.data && typeof section.data === 'object') {
+                result[section.id] = section.data as Record<string, any>;
+            }
+        }
+        return result;
+    }
+
     return {
         getSectionData,
         getCollectionData,
@@ -298,7 +310,8 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
         getAllSections,
         getManifest,
         getGateConfig,
-        getStateTypes
+        getStateTypes,
+        getAllSectionData
     };
 }
 

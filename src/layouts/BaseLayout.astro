@@ -2,7 +2,7 @@
 import Head from '../components/Head.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { getSectionData, isSectionEnabled, getTheme, getStyleOverridesCSS, getStateTypes } from '../lib/manifest-loader';
+import { getSectionData, isSectionEnabled, getTheme, getStyleOverridesCSS, getStateTypes, getAllSectionData } from '../lib/manifest-loader';
 
 const theme = getTheme();
 const styleOverridesCSS = getStyleOverridesCSS();
@@ -32,6 +32,7 @@ export interface Props {
 
 const { title, seo, transparentNav = false, gateConfig = null } = Astro.props;
 const stateTypes = getStateTypes();
+const sectionData = getAllSectionData();
 ---
 
 <!DOCTYPE html>
@@ -72,20 +73,52 @@ const stateTypes = getStateTypes();
 
     {isSectionEnabled('footer') && <Footer data={footerData} />}
 
+    <script is:inline define:vars={{ sectionData: sectionData }}>
+    (function(d){
+      function matchResult(conds){
+        var hasVal=false,matched=false;
+        for(var i=0;i<conds.length;i++){
+          var c=conds[i],fv=(d[c.s]||{})[c.f];
+          if(fv!==null&&fv!==undefined){hasVal=true;if(String(fv)===c.v){matched=true;break;}}
+        }
+        return hasVal?matched:null;
+      }
+      function parseCond(attr){
+        return attr.split('|').map(function(p){
+          var eq=p.indexOf('='),dot=p.indexOf('.');
+          if(eq===-1||dot===-1)return null;
+          return{s:p.substring(0,dot),f:p.substring(dot+1,eq),v:p.substring(eq+1)};
+        }).filter(Boolean);
+      }
+      function run(){
+        document.querySelectorAll('[data-dr-show-when]').forEach(function(el){
+          var r=matchResult(parseCond(el.getAttribute('data-dr-show-when')||''));
+          if(r!==null)el.style.display=r?'':'none';
+        });
+        document.querySelectorAll('[data-dr-hide-when]').forEach(function(el){
+          var r=matchResult(parseCond(el.getAttribute('data-dr-hide-when')||''));
+          if(r!==null)el.style.display=r?'none':'';
+        });
+      }
+      if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',run);}else{run();}
+    })(sectionData);
+    </script>
+
     <script is:inline src="/preview-runtime.min.js"></script>
     <script>
       import '../lib/manifest-injector';
     </script>
 
     {gateConfig && gateConfig.siteToken && (
-      <script is:inline define:vars={{ 
+      <script is:inline define:vars={{
         sectionId: gateConfig.sectionId,
         token: gateConfig.siteToken,
         endpoint: gateConfig.submissionEndpoint,
         anonKey: gateConfig.supabaseAnonKey,
-        stateTypes: stateTypes
+        stateTypes: stateTypes,
+        sectionData: sectionData
       }}>
-        window.__DLR = { sectionId, token, endpoint, anonKey, stateTypes };
+        window.__DLR = { sectionId, token, endpoint, anonKey, stateTypes, sectionData };
       </script>
       <script is:inline src="/gate-runtime.min.js"></script>
     )}
