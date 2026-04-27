@@ -222,7 +222,7 @@
               "value": "video"
             }
           },
-          "heroType": {
+          "heroMediaType": {
             "type": "string",
             "uiLabel": "Media Type",
             "uiWidget": "select",
@@ -465,7 +465,7 @@
         "backgroundImageAlt": "Luxury oceanfront residential tower",
         "heroVideo": "https://pub-da5fe52c12854625bef20ed173f635f1.r2.dev/shared-defaults/demo-video.mp4",
         "ctaText": "Contact Us",
-        "heroType": "image",
+        "heroMediaType": "image",
         "images": [
           {
             "src": "https://pub-da5fe52c12854625bef20ed173f635f1.r2.dev/shared-defaults/default-hero.jpg",

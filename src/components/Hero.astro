@@ -39,7 +39,7 @@ const overlayEnabled = data.overlayEnabled !== false;
 
     <!-- Image Mode -->
     <div
-      data-dr-show-when="hero.heroType=image"
+      data-dr-show-when="hero.heroMediaType=image"
       class="w-full h-full"
     >
       <img
@@ -56,7 +56,7 @@ const overlayEnabled = data.overlayEnabled !== false;
 
     <!-- Carousel Mode -->
     <div
-      data-dr-show-when="hero.heroType=carousel"
+      data-dr-show-when="hero.heroMediaType=carousel"
       class="w-full h-full"
     >
       <div class="hero-carousel w-full h-full relative" data-dr-list="images">
@@ -84,7 +84,7 @@ const overlayEnabled = data.overlayEnabled !== false;
 
     <!-- Video Mode -->
     <div
-      data-dr-show-when="hero.heroType=video"
+      data-dr-show-when="hero.heroMediaType=video"
       class="relative w-full h-full"
     >
       <div
@@ -167,7 +167,7 @@ const overlayEnabled = data.overlayEnabled !== false;
   <div
     class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2"
     id="hero-dots"
-    data-dr-show-when="hero.heroType=carousel"
+    data-dr-show-when="hero.heroMediaType=carousel"
     style={carouselImages.length <= 1 ? 'display: none !important;' : ''}
   >
     {carouselImages.map((_, i) => (
@@ -182,7 +182,7 @@ const overlayEnabled = data.overlayEnabled !== false;
   <!-- Slide Counter (carousel only) -->
   <div
     class="absolute bottom-10 right-8 md:right-12 z-20 font-sans text-[11px] tracking-[0.2em] text-primary-foreground/25 select-none"
-    data-dr-show-when="hero.heroType=carousel"
+    data-dr-show-when="hero.heroMediaType=carousel"
     style={carouselImages.length <= 1 ? 'display: none !important;' : ''}
   >
     <span id="hero-current">01</span>&thinsp;/&thinsp;<span id="hero-total">{String(carouselImages.length).padStart(2, '0')}</span>
@@ -375,7 +375,7 @@ const overlayEnabled = data.overlayEnabled !== false;
     });
 
     function observeCarouselVisibility() {
-      var carouselWrapper = document.querySelector('[data-dr-show-when="hero.heroType=carousel"]');
+      var carouselWrapper = document.querySelector('[data-dr-show-when="hero.heroMediaType=carousel"]');
       if (!carouselWrapper) return;
 
       var observer = new MutationObserver(function () {
