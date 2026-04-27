@@ -6,7 +6,7 @@
 
 // @ts-ignore - JSON import handled by Astro/Vite
 import manifest from '../../template.manifest.json';
-// Inlined from @dreamlr/manifest-loader
+// REMOVED MARKER
 export interface ManifestSection {
     id: string;
     enabled?: boolean;
@@ -276,6 +276,19 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
         };
     }
 
+    /**
+     * Get state types from manifest
+     * 
+     * State types declare the structure and validation rules for dynamic state.
+     */
+    function getStateTypes(): Record<string, any> {
+        const stateTypes = (manifest as any).stateTypes;
+        if (!stateTypes || typeof stateTypes !== 'object') {
+            return {};
+        }
+        return stateTypes;
+    }
+
     return {
         getSectionData,
         getCollectionData,
@@ -284,7 +297,8 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
         getStyleOverridesCSS,
         getAllSections,
         getManifest,
-        getGateConfig
+        getGateConfig,
+        getStateTypes
     };
 }
 
@@ -298,7 +312,8 @@ const {
     getStyleOverridesCSS, 
     getAllSections, 
     getManifest,
-    getGateConfig
+    getGateConfig,
+    getStateTypes
 } = createManifestLoader({
     manifest,
     defaultTheme: {
@@ -328,5 +343,6 @@ export {
     getStyleOverridesCSS,
     getAllSections,
     getManifest,
-    getGateConfig
+    getGateConfig,
+    getStateTypes
 };
