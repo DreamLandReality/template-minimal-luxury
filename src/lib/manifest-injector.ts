@@ -1,5 +1,5 @@
 /**
- * Dream Reality — Manifest Injector
+ * Template Library — Manifest Injector
  *
  * Activates ONLY when ?manifest=<url> is in the URL.
  * Fetches an external manifest JSON and applies it to the page,

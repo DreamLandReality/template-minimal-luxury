@@ -18,11 +18,16 @@
             "supabaseAnonKey": null,
             "actions": [
                 { "id": "price", "mode": "reveal" },
-                { "id": "brochure", "mode": "download" },
-                { "id": "floor-plan", "mode": "reveal" }
+                { "id": "brochure", "mode": "download" }
             ]
         }
     ],
+    "gateActionOwnership": {
+        "lead-capture": {
+            "price": ["price-unlock"],
+            "brochure": ["brochure"]
+        }
+    },
     "stateTypes": {
         "hero.heroMediaType": {
             "type": "enum",
@@ -132,7 +137,7 @@
             "dataType": "object",
             "enabled": true,
             "data": {
-                "logoText": "LUXURY.",
+                "logoText": "MINIMAL",
                 "links": [
                     {
                         "label": "Home",
@@ -818,13 +823,13 @@
                 "sectionTitle": "What Our Clients Say",
                 "items": [
                     {
-                        "name": "Sarah Mitchell",
+                        "name": "Template Client One",
                         "photo": null,
                         "text": "The attention to detail and quality of finishes exceeded all expectations. This is truly luxury living at its finest.",
                         "rating": 5
                     },
                     {
-                        "name": "James Chen",
+                        "name": "Template Client Two",
                         "photo": null,
                         "text": "From the first viewing to move-in, the entire experience was seamless. The team's professionalism is unmatched.",
                         "rating": 5
@@ -1341,8 +1346,8 @@
             "dataType": "object",
             "enabled": true,
             "data": {
-                "copyright": "\u00a9 2025 Dream Luxury. All rights reserved.",
-                "branding": "Design by Dream Reality"
+                "copyright": "\u00a9 2025 Minimal Luxury Template. All rights reserved.",
+                "branding": "Template by Minimal Luxury"
             }
         },
         {
@@ -1545,13 +1550,13 @@
             "dataType": "object",
             "enabled": true,
             "data": {
-                "title": "Dream Reality | Minimal Luxury",
+                "title": "Minimal Luxury Template",
                 "description": "A showcase of minimal luxury architecture and design.",
                 "keywords": [
                     "minimal luxury",
                     "luxury architecture",
                     "modern design",
-                    "dream reality",
+                    "minimal luxury template",
                     "luxury living"
                 ],
                 "image": null,
@@ -1562,7 +1567,7 @@
                 "metaPixelId": null,
                 "googleAdsId": null,
                 "structuredData": {
-                    "propertyName": "Dream Reality",
+                    "propertyName": "Minimal Luxury Template",
                     "propertyType": "Apartment",
                     "description": "A showcase of minimal luxury architecture and design.",
                     "url": null,
@@ -1573,9 +1578,9 @@
                         "currency": "INR"
                     },
                     "address": {
-                        "street": "Luxury Avenue",
-                        "locality": "Whitefield",
-                        "region": "Karnataka",
+                        "street": "Template Avenue",
+                        "locality": "Template District",
+                        "region": "Template Region",
                         "postalCode": "560066",
                         "country": "IN"
                     },
@@ -1584,8 +1589,8 @@
                         "longitude": null
                     },
                     "developer": {
-                        "name": "Dream Reality Group",
-                        "url": "https://www.dreamreality.com",
+                        "name": "Minimal Luxury Template",
+                        "url": null,
                         "logo": null
                     }
                 }
