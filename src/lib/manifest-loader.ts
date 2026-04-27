@@ -6,7 +6,7 @@
 
 // @ts-ignore - JSON import handled by Astro/Vite
 import manifest from '../../template.manifest.json';
-// REMOVED MARKER
+// Inlined from @dreamlr/manifest-loader
 export interface ManifestSection {
     id: string;
     enabled?: boolean;
@@ -277,8 +277,8 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
     }
 
     /**
-     * Get state types from manifest
-     * 
+     * Get state type definitions for universal state management (T-TL-34).
+     * Returns empty object if stateTypes block doesn't exist in manifest.
      * State types declare the structure and validation rules for dynamic state.
      */
     function getStateTypes(): Record<string, any> {
