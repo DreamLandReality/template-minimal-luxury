@@ -73,6 +73,19 @@ const imgSrc = (path: string) => path?.startsWith('http') ? path : `/${path}`;
           <span data-dr-field="buttonText">{data.buttonText || 'Download PDF'}</span>
         </a>
 
+        <div
+          hidden
+          role="status"
+          class="mt-6 border-l-2 border-accent bg-primary/[0.03] px-5 py-4 text-sm leading-relaxed text-muted"
+          data-gate-feedback="lead-capture"
+          data-gate-feedback-action="brochure"
+          data-gate-feedback-reason="download_unavailable"
+        >
+          <p data-gate-feedback-message>
+            Brochure is not available yet. Please contact our advisory team.
+          </p>
+        </div>
+
       </div>
     </div>
 
