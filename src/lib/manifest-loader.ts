@@ -176,13 +176,13 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
 
     function isNavEligibleSection(sectionId: string, pageSectionIds: string[]): boolean {
         const firstPageSectionId = pageSectionIds[0];
-        return sectionId !== firstPageSectionId && !['navigation', 'footer', 'seo'].includes(sectionId);
+        return sectionId !== firstPageSectionId && pageSectionIds.includes(sectionId);
     }
 
-    function getNavItems(pageId = 'home'): NavItem[] {
+    function getNavItems(pageId?: string): NavItem[] {
         const pages = (manifest as any).pages;
         const page = Array.isArray(pages)
-            ? pages.find((item: any) => item.id === pageId) ?? pages.find((item: any) => item.path === '/') ?? pages[0]
+            ? (pageId ? pages.find((item: any) => item.id === pageId) : null) ?? pages.find((item: any) => item.path === '/') ?? pages[0]
             : null;
         const pageSectionIds = Array.isArray(page?.sections) ? page.sections : [];
 

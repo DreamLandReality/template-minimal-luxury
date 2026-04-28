@@ -43,6 +43,19 @@
       ]
     }
   },
+  "leadSources": {
+    "contact": {
+      "label": "Contact",
+      "kind": "contact",
+      "sectionId": "contact-form"
+    },
+    "price-unlock": {
+      "label": "Price Unlock",
+      "kind": "gate",
+      "sectionId": "price-unlock",
+      "gateId": "lead-capture"
+    }
+  },
   "stateTypes": {
     "hero.heroMediaType": {
       "type": "enum",
