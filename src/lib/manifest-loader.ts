@@ -313,11 +313,11 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
         if (!Array.isArray(gates)) return [];
         return gates.map((gate: any) => ({
             id: gate.id ?? 'lead-capture',
-            statePath: gate.statePath ?? `${gate.id ?? 'lead-capture'}.state`,
-            storageKey: gate.storageKey ?? `dlr_gate_${(manifest as any).templateId ?? 'template'}_${gate.id ?? 'lead-capture'}_${(gate.statePath ?? `${gate.id ?? 'lead-capture'}.state`).replace(/\./g, '_')}`,
-            defaultState: gate.defaultState ?? 'locked',
+            statePath: gate.statePath,
+            storageKey: gate.storageKey ?? `dlr_gate_${(manifest as any).templateId ?? 'template'}_${gate.id ?? 'lead-capture'}_${String(gate.statePath ?? gate.id ?? 'gate').replace(/\./g, '_')}`,
+            defaultState: gate.defaultState,
             formState: gate.formState,
-            successState: gate.successState ?? 'unlocked',
+            successState: gate.successState,
             failureState: gate.failureState,
             expiredState: gate.expiredState,
             persistStates: gate.persistStates,

@@ -1,0 +1,51 @@
+---
+export interface Props {
+  data: {
+    errorCode?: string;
+    errorTitle?: string;
+    errorMessage?: string;
+    returnHomeText?: string;
+  };
+}
+
+const { data } = Astro.props;
+---
+
+<div class="h-screen flex flex-col items-center justify-center text-center px-8" data-dr-section="error-page">
+  <p class="text-[10px] uppercase tracking-[0.4em] text-muted mb-6">Error</p>
+  <h1
+    class="text-8xl md:text-9xl font-serif font-light text-primary mb-4"
+    data-dr-field="errorCode"
+    data-dr-style="errorCode"
+  >
+    {data.errorCode}
+  </h1>
+  <p
+    class="text-xl md:text-2xl font-serif font-light text-primary mb-3"
+    data-dr-field="errorTitle"
+    data-dr-style="errorTitle"
+  >
+    {data.errorTitle}
+  </p>
+  <p
+    class="text-sm text-muted mb-10 max-w-sm leading-relaxed"
+    data-dr-field="errorMessage"
+    data-dr-style="errorMessage"
+  >
+    {data.errorMessage}
+  </p>
+  <a
+    href="/"
+    class="inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-primary border-b border-primary pb-1 hover:text-muted hover:border-muted transition-colors duration-300"
+  >
+    <span
+      data-dr-field="returnHomeText"
+      data-dr-style="returnHomeText"
+    >
+      {data.returnHomeText}
+    </span>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+    </svg>
+  </a>
+</div>

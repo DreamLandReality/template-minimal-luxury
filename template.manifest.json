@@ -973,7 +973,7 @@
       "name": "Project Brochure",
       "description": "Split-screen section with an image on one side and a brochure download CTA on the other.",
       "required": false,
-      "enabled": false,
+      "enabled": true,
       "imageSlots": [
         "backgroundImage"
       ],
