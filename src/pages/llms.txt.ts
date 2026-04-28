@@ -1,10 +1,9 @@
 import type { APIRoute } from 'astro';
-import { getSectionData, isSectionEnabled } from '../lib/manifest-loader';
+import { getSectionData, getNavItems, isSectionEnabled } from '../lib/manifest-loader';
 
 export const GET: APIRoute = ({ site }) => {
   const siteUrl = site?.origin || 'http://localhost:4321';
   const seo = getSectionData('seo') as any;
-  const nav = getSectionData('navigation') as any;
   const sd = seo.structuredData;
 
   const propertyName = sd?.propertyName || seo.title || 'Property';
@@ -23,7 +22,7 @@ export const GET: APIRoute = ({ site }) => {
   const developerName = sd?.developer?.name || '';
   const developerUrl = sd?.developer?.url || '';
 
-  const navLinks: { label: string; href: string }[] = nav?.links || [];
+  const navLinks = getNavItems('home').filter((item) => item.visible);
 
   const sectionsBlock = navLinks.length > 0
     ? navLinks.map(l => `- [${l.label}](${siteUrl}${l.href.startsWith('/') || l.href.startsWith('#') ? l.href.replace(/^#/, '/#') : l.href})`).join('\n')

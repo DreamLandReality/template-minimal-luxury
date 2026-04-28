@@ -2,14 +2,13 @@
 import Head from '../components/Head.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { getSectionData, isSectionEnabled, getTheme, getStyleOverridesCSS, getStateTypes, getAllSectionData } from '../lib/manifest-loader';
+import { getSectionData, isSectionEnabled, getTheme, getStyleOverridesCSS, getStateTypes, getAllSectionData, getNavItems } from '../lib/manifest-loader';
 
 const theme = getTheme();
 const styleOverridesCSS = getStyleOverridesCSS();
 const navData = getSectionData<{
   logoText: string;
   logoImageUrl?: string;
-  links: { label: string; href: string }[];
   ctaText?: string;
   ctaHref?: string;
 }>('navigation');
@@ -28,6 +27,7 @@ export interface Props {
 const { title, seo, transparentNav = false, gateConfigs = [] } = Astro.props;
 const stateTypes = getStateTypes();
 const sectionData = getAllSectionData();
+const navItems = getNavItems('home');
 ---
 
 <!DOCTYPE html>
@@ -56,11 +56,20 @@ const sectionData = getAllSectionData();
         --font-serif: var(--font-serif);
         --radius: var(--radius);
       }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      [data-dr-section],
+      [data-dr-generated-anchor] {
+        scroll-margin-top: 96px;
+      }
     </style>
 
     {styleOverridesCSS && <style set:html={styleOverridesCSS} />}
 
-    {isSectionEnabled('navigation') && <Nav data={navData} transparentNav={transparentNav} />}
+    {isSectionEnabled('navigation') && <Nav data={navData} links={navItems} transparentNav={transparentNav} />}
 
     <main>
       <slot />
@@ -70,6 +79,38 @@ const sectionData = getAllSectionData();
 
     <script is:inline define:vars={{ stateTypes: stateTypes, sectionData: sectionData }}>
       window.__DLR = { ...(window.__DLR || {}), stateTypes, sectionData };
+    </script>
+
+    <script is:inline>
+      (function () {
+        function ensureSectionAnchors() {
+          document.querySelectorAll('[data-dr-section]').forEach(function (el) {
+            var sectionId = el.getAttribute('data-dr-section');
+            if (!sectionId || document.getElementById(sectionId)) return;
+            if (!el.id) {
+              el.id = sectionId;
+              return;
+            }
+            var anchor = document.createElement('span');
+            anchor.id = sectionId;
+            anchor.setAttribute('data-dr-generated-anchor', 'true');
+            anchor.setAttribute('aria-hidden', 'true');
+            anchor.style.cssText = 'display:block;height:0;overflow:hidden;';
+            el.parentNode && el.parentNode.insertBefore(anchor, el);
+          });
+
+          if (window.location.hash) {
+            var target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+            if (target) requestAnimationFrame(function () { target.scrollIntoView({ block: 'start' }); });
+          }
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', ensureSectionAnchors);
+        } else {
+          ensureSectionAnchors();
+        }
+      })();
     </script>
 
     <script is:inline src="/preview-runtime.min.js"></script>

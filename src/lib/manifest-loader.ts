@@ -9,7 +9,9 @@ import manifest from '../../template.manifest.json';
 // Inlined from @dreamlr/manifest-loader
 export interface ManifestSection {
     id: string;
+    name?: string;
     enabled?: boolean;
+    showInNav?: boolean;
     dataType?: 'object' | 'array';
     data?: any;
     schema?: any;
@@ -52,7 +54,12 @@ export interface GateConfig {
     id: string;
     statePath: string;
     storageKey: string;
-    defaultState: 'locked' | 'modal' | 'unlocked';
+    defaultState: string;
+    formState?: string;
+    successState: string;
+    failureState?: string;
+    expiredState?: string;
+    persistStates?: string[];
     persist: boolean;
     formSectionId?: string;
     siteToken: string | null;
@@ -62,6 +69,13 @@ export interface GateConfig {
         id: string;
         mode: 'reveal' | 'download' | 'custom';
     }>;
+}
+
+export interface NavItem {
+    sectionId: string;
+    label: string;
+    href: string;
+    visible: boolean;
 }
 
 export interface ManifestLoaderConfig {
@@ -158,6 +172,29 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
     function isSectionEnabled(sectionId: string): boolean {
         const section = sectionsMap.get(sectionId);
         return section?.enabled !== false;
+    }
+
+    function isNavEligibleSection(sectionId: string, pageSectionIds: string[]): boolean {
+        const firstPageSectionId = pageSectionIds[0];
+        return sectionId !== firstPageSectionId && !['navigation', 'footer', 'seo'].includes(sectionId);
+    }
+
+    function getNavItems(pageId = 'home'): NavItem[] {
+        const pages = (manifest as any).pages;
+        const page = Array.isArray(pages)
+            ? pages.find((item: any) => item.id === pageId) ?? pages.find((item: any) => item.path === '/') ?? pages[0]
+            : null;
+        const pageSectionIds = Array.isArray(page?.sections) ? page.sections : [];
+
+        return pageSectionIds
+            .map((sectionId: string) => sectionsMap.get(sectionId))
+            .filter((section: ManifestSection | undefined): section is ManifestSection => Boolean(section?.id && isNavEligibleSection(section.id, pageSectionIds)))
+            .map((section: ManifestSection) => ({
+                sectionId: section.id,
+                label: section.name ?? section.id,
+                href: `#${section.id}`,
+                visible: section.enabled !== false && section.showInNav === true
+            }));
     }
 
     /**
@@ -279,6 +316,11 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
             statePath: gate.statePath ?? `${gate.id ?? 'lead-capture'}.state`,
             storageKey: gate.storageKey ?? `dlr_gate_${(manifest as any).templateId ?? 'template'}_${gate.id ?? 'lead-capture'}_${(gate.statePath ?? `${gate.id ?? 'lead-capture'}.state`).replace(/\./g, '_')}`,
             defaultState: gate.defaultState ?? 'locked',
+            formState: gate.formState,
+            successState: gate.successState ?? 'unlocked',
+            failureState: gate.failureState,
+            expiredState: gate.expiredState,
+            persistStates: gate.persistStates,
             persist: gate.persist !== false,
             formSectionId: gate.formSectionId,
             siteToken: gate.siteToken ?? null,
@@ -317,6 +359,7 @@ export function createManifestLoader(config: ManifestLoaderConfig) {
         getSectionData,
         getCollectionData,
         isSectionEnabled,
+        getNavItems,
         getTheme,
         getStyleOverridesCSS,
         getAllSections,
@@ -333,6 +376,7 @@ const {
     getSectionData, 
     getCollectionData, 
     isSectionEnabled, 
+    getNavItems,
     getTheme, 
     getStyleOverridesCSS, 
     getAllSections, 
@@ -365,6 +409,7 @@ export {
     getSectionData,
     getCollectionData,
     isSectionEnabled,
+    getNavItems,
     getTheme,
     getStyleOverridesCSS,
     getAllSections,
