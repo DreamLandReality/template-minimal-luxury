@@ -18,7 +18,7 @@
       ],
       "persist": true,
       "formSectionId": "price-unlock",
-      "siteToken": "demo-minimal-luxury",
+      "siteToken": null,
       "submissionEndpoint": null,
       "supabaseAnonKey": null,
       "actions": [
